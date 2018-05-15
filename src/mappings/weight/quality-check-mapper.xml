@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.weight.QualityCheckMapper">
+<select id="findQualityCheckByBId" resultType="com.zyiot.entity.weight.QualityCheckFormMap">
+select * from t_weight_quality_check where bId=#{0}
+</select>
+<select id="findQualityCheck" resultType="com.zyiot.entity.weight.QualityCheckFormMap">
+select 
+twrh.id,
+tw.wName,
+twl.wName wlName,
+twrh.grainProperty,
+twrh.grainVariety,
+twrh.totalWeight,
+twrh.addDate,
+twrh.inOrOut,
+twqc.`level`,
+twqc.rz,
+twqc.sf,
+twqc.zz,
+twqc.kwz,
+twqc.bwsld,
+twqc.zjml,
+twqc.gwcm,
+twqc.hlm,
+twqc.hh,
+twqc.cmbl,
+twqc.szqw,
+twqc.ydzs
+from 
+t_weight_report_harbor twrh
+LEFT JOIN t_weight_quality_check twqc ON twrh.bId = twqc.bId 
+LEFT JOIN t_warehouse tw on twrh.wId = tw.id
+LEFT JOIN t_warehouse_location twl ON tw.wLocation = twl.id
+
+where 1=1
+<if test="inOrOut != null and inOrOut != ''">
+ AND twrh.inOrOut = #{inOrOut}
+</if>
+<if test="wlId != null and wlId != ''">
+ AND twl.id = #{wlId}
+</if>
+<if test="wId != null and wId != ''">
+ AND tw.id = #{wId}
+</if>
+<if test="checkBeginDate != null and checkBeginDate != '' and checkEndDate != null and checkEndDate != ''">
+ AND twrh.addDate between #{checkBeginDate} and #{checkEndDate}
+</if>
+ order by twrh.id desc
+</select>
+<select id="findPrintCheckByBId" resultType="com.zyiot.entity.weight.QualityCheckFormMap">
+select twqc.*,twrh.userName,twrh.grainVariety from (select bId,userName,grainVariety from t_weight_report_harbor WHERE bId = #{0}) as twrh LEFT JOIN
+(select sf,zz,rz,zjml,bwsld,cmbl,szqw,`level`,bId,remark,checkWeight,checkAim from t_weight_quality_check where bId = #{0}) as twqc ON twrh.bId = twqc.bId
+</select>
+</mapper>

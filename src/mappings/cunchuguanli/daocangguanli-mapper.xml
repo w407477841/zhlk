@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cunchuguanli.DaoCangGuanLiMapper">
+
+<select id="findByPage" resultType="com.zyiot.entity.cunchuguanli.DaoCangGuanLiFormMap">
+
+select twgt.*,
+tw1.wName wNameO,
+tw2.wName wNameT,
+tpa1.paName paNameO,
+tpa2.paName paNameT 
+from t_warehouse_grain_transfer as twgt,t_warehouse as tw1,t_warehouse as tw2,t_person_archives as tpa1,t_person_archives as tpa2
+where twgt.wgtOriginalId = tw1.id 
+and twgt.wgtTargetId = tw2.id
+and twgt.wgtOriginalStoreman = tpa1.id
+and twgt.wgtTargetStoreman = tpa2.id
+
+<if test="wgtBill !=null and wgtBill !=''">
+and twgt.wgtBill like '%${wgtBill}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findDaoCangGuanLiById" resultType="com.zyiot.entity.cunchuguanli.DaoCangGuanLiFormMap">
+select twgtcc.*,tcc.text category from (
+select twgtc.*,tc.text variety from (
+select twgt.*,
+tw1.wName wNameo,
+tw2.wName wNamet,
+tpa1.paName paNameo,
+tpa2.paName paNamet,
+tw1.wLocation wLocationo,
+tw2.wLocation wLocationt,
+twl1.wName wlNameo,
+twl2.wName wlNamet
+from t_warehouse_grain_transfer as twgt,t_warehouse as tw1,t_warehouse as tw2,t_person_archives as tpa1,t_person_archives as tpa2,
+t_warehouse_location as twl1,t_warehouse_location as twl2
+where twgt.wgtOriginalId = tw1.id 
+and twgt.wgtTargetId = tw2.id
+and twgt.wgtOriginalStoreman = tpa1.id
+and twgt.wgtTargetStoreman = tpa2.id
+and twl1.id = tw1.wLocation
+and twl2.id = tw2.wLocation
+and twgt.id=#{0}
+) as twgtc left JOIN t_codeitem as tc on twgtc.wgtOriginalVariety = tc.id and tc.codeid=12
+) as twgtcc left JOIN t_codeitem as tcc on twgtcc.wgtOriginalCategory = tcc.id and tcc.codeid=11
+</select>
+
+<select id="findDaoCangGuanLiByWarehouseId" resultType="com.zyiot.entity.cunchuguanli.DaoCangGuanLiFormMap">
+select tsicc.*,twa.waStoreman,tpa.paName from (
+select tsic.*,tcc.text variety FROM
+(select  tsi.*,tc.text category from t_storag_info as tsi LEFT JOIN t_codeitem as tc ON tsi.quanZhong=tc.id and tc.codeid=11) as tsic
+LEFT JOIN t_codeitem tcc on tsic.`name`=tcc.id and tcc.codeid=12
+) as tsicc,t_warehouse_archives as twa,t_person_archives as tpa where tsicc.storageID = twa.wId and twa.waStoreman = tpa.id
+and tsicc.storageID=#{0}
+</select>
+</mapper>
+

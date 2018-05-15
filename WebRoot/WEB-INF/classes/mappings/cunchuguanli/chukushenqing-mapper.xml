@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cunchuguanli.ChuKuShenQingMapper">
+
+<select id="findByPage" resultType="com.zyiot.entity.cunchuguanli.ChuKuShenQingFormMap">
+select tgsa.*,
+tw.wName,
+twl.wName wlName,
+tc.text department,
+tba.agreementID
+ from 
+(
+select * from t_getout_storage_apply where 1=1
+<if test="gsaApplyBill !=null and gsaApplyBill !=''">
+and gsaApplyBill like '%${gsaApplyBill}%'
+</if>
+) as tgsa LEFT JOIN
+t_warehouse as tw ON tgsa.gsaWId = tw.id LEFT JOIN
+t_warehouse_location as twl ON tw.wLocation = twl.id LEFT JOIN
+(select id,text from t_codeitem where codeid = 9) as tc ON tgsa.gsaApplyDepartment = tc.id LEFT JOIN
+t_business_agreement as tba ON tgsa.gsaAgreementBill = tba.id
+
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findShenPiByPage" resultType="com.zyiot.entity.cunchuguanli.ChuKuShenQingFormMap">
+select tgsa.*,
+tw.wName,
+twl.wName wlName,
+tc.text department,
+tba.agreementID
+ from 
+(
+select * from t_getout_storage_apply where gsaProcess = '等待审批'
+<if test="gsaApplyBill !=null and gsaApplyBill !=''">
+and gsaApplyBill like '%${gsaApplyBill}%'
+</if>
+) as tgsa LEFT JOIN
+t_warehouse as tw ON tgsa.gsaWId = tw.id LEFT JOIN
+t_warehouse_location as twl ON tw.wLocation = twl.id LEFT JOIN
+(select id,text from t_codeitem where codeid = 9) as tc ON tgsa.gsaApplyDepartment = tc.id LEFT JOIN
+t_business_agreement as tba ON tgsa.gsaAgreementBill = tba.id
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findChuKuShenQingById" resultType="com.zyiot.entity.cunchuguanli.ChuKuShenQingFormMap">
+select tgsa.*,tw.wLocation
+from 
+t_getout_storage_apply as tgsa LEFT JOIN
+t_warehouse as tw
+ON tgsa.gsaWId=tw.id
+where tgsa.id=#{0}
+
+</select>
+<select id="lookChuKuShenQingById" resultType="com.zyiot.entity.cunchuguanli.ChuKuShenQingFormMap">
+select apply.*,tu.userName from (
+select tgsa.*,
+tw.wName,
+twl.wName wlName,
+tc.text department,
+tba.agreementID
+ from 
+(select * from t_getout_storage_apply where id=#{0}) as tgsa LEFT JOIN
+t_warehouse as tw ON tgsa.gsaWId = tw.id LEFT JOIN
+t_warehouse_location as twl ON tw.wLocation = twl.id LEFT JOIN
+(select id,text from t_codeitem where codeid=9) as tc ON tgsa.gsaApplyDepartment = tc.id LEFT JOIN
+t_business_agreement as tba ON tgsa.gsaAgreementBill = tba.id 
+) AS apply LEFT JOIN t_user as tu ON apply.gsaAuditor = tu.id
+
+</select>
+</mapper>
+

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.weight.QualityMapper">
+<select id="findByVarietyId" resultType="com.zyiot.entity.weight.QualityFormMap">
+select twa.*,CONCAT(twt.id," | ",twt.tName) AS tName from (select * from t_weight_quality_archives where vId = #{0}) as twa LEFT JOIN t_weight_quality_type as twt ON twa.zjbh = twt.id 
+</select>
+<select id="findQualityByVarietyId" resultType="com.zyiot.entity.weight.QualityFormMap">
+select * from (select id,tName from t_weight_quality_type) as twqt
+LEFT JOIN(select id as aId,zjbh,vId,standard,miniValue,maxiValue,rank,reduceStandard,increaseRange,increaseValue,reduceValue from t_weight_quality_archives where vId=#{0}) as twqa
+ON twqt.id = twqa.zjbh
+</select>
+
+</mapper>

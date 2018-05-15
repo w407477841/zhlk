@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.yaojiguanli.YaoJiLingYongMapper">
+
+<select id="findByPage" resultType="com.zyiot.entity.yaojiguanli.YaoJiLingYongFormMap">
+select 
+tmu.id,
+tmu.muName,
+tmu.muBrand,
+tmu.muStandard,
+tmu.muUsedDate,
+tmu.muManufactureDate,
+tmu.muApplicant,
+tmu.muAuditor,
+tmu.muSupervisor,
+tmu.muQuantity,
+tc.text,
+wl.wName
+from 
+t_medicament_used as tmu,
+t_codeitem tc,
+t_warehouse_location wl
+where tc.codeid = 22 AND
+tmu.muPage = tc.id AND
+tmu.muWLNo = wl.wNo
+<if test="muName !=null and muName !=''">
+and tmu.muName like '%${muName}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findYaoJiLingYongById" resultType="com.zyiot.entity.yaojiguanli.YaoJiLingYongFormMap">
+select 
+tmu.*,
+tc.text page,
+tc1.text drug,
+wl.wName
+from 
+t_medicament_used as tmu,
+t_codeitem as tc,
+t_codeitem as tc1,
+t_warehouse_location as wl
+where tc.codeid=22 AND
+tmu.muPage = tc.id AND
+tc1.codeid = 16 AND
+tmu.muDrug = tc1.id AND
+tmu.muWLNo = wl.wNo AND
+tmu.id=#{0}
+</select>
+</mapper>
+

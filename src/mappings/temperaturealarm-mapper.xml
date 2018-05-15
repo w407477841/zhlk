@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.TemperatureAlarmMapper">
+<select id="findByPage" resultType="com.zyiot.entity.TemperatureAlarmFormMap">
+select 
+tta.*,
+tw.wName,
+twl.wName wlName
+from 
+t_temperature_alarm as tta,
+t_warehouse as tw,
+t_warehouse_location as twl
+where tta.wId = tw.id
+AND
+tw.wLocation = twl.id
+<if test="wlName != null and wlName != ''">
+and twl.wName like '%${wlName}%'
+</if>
+<if test="wName != null and wName != ''">
+and tw.wName like '%${wName}%'
+</if>
+<if test="orderby != null and orderby != ''">
+${orderby}
+</if>
+</select>
+<select id="findTemperatureAlarmById" resultType="com.zyiot.entity.TemperatureAlarmFormMap">
+select 
+tta.*,
+tw.wName,
+twl.wName wlName
+from 
+t_temperature_alarm as tta,
+t_warehouse as tw,
+t_warehouse_location as twl
+where tta.wId = tw.id
+AND
+tw.wLocation = twl.id and
+tta.id = #{0}
+</select>
+</mapper>

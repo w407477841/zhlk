@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.jichuziliao.CangFangXinXiMapper">
+<sql id="selectId">
+twa.id id,
+tw.id wId,
+tw.wLocation wLocationId,
+twl.wName,
+tw.wName waName,
+waHeatInsulator,
+waWindow,
+waWarehouseType,
+waDoorNumber,
+waStructure,
+waAeration,
+waFumigate,
+waConstructDate,
+waDesignCapacity,
+waDesignHeight,
+waInnerLong,
+waInnerWidth,
+waStoreman,
+waSequence,
+waDataOperator,
+twa.version version
+</sql>
+<select id="findByPage" resultType="com.zyiot.entity.jichuziliao.CangFangXinXiFormMap">
+
+select <include refid="selectId"></include> from t_warehouse_archives as twa,t_warehouse as tw,t_warehouse_location as twl where twa.wId=tw.id and tw.wDisable=1 and tw.wLocation=twl.id
+<if test="wNo !=null and wNo !=''">
+and tw.id = #{wNo}
+</if>
+<if test="waLocation !=null and waLocation !=''">
+and tw.wLocation like '%${waLocation}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findCangFangXinXiById" resultType="com.zyiot.entity.jichuziliao.CangFangXinXiFormMap">
+select twa.*,
+tw.id as wId ,
+tw.wLocation wLocationId
+from t_warehouse_archives as twa,t_warehouse as tw where twa.wId=tw.id and tw.wDisable=1 and twa.id=#{0}
+</select>
+<select id="findStroremanById" resultType="com.zyiot.entity.jichuziliao.CangFangXinXiFormMap">
+select 
+tpa.id,
+tpa.paName
+from t_warehouse_archives as twa,t_person_archives as tpa where twa.waStoreman = tpa.id and twa.wId=#{0}
+</select>
+<select id="findBywId" resultType="com.zyiot.entity.jichuziliao.CangFangXinXiFormMap">
+select 
+*
+from t_warehouse_archives where wId=#{0}
+</select>
+</mapper>
+

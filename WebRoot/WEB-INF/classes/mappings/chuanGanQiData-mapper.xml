@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.ChuanGanQiDataMapper">
+<select id="getDatas" resultType="com.zyiot.entity.ChuanGanQiDataFormMap">
+select location.wName kd,w.wName ck,DATE_FORMAT(t3.cjsj,'%Y-%c-%d %H:%i:%s') cjsj,t1.datas yq, t2.datas eyht ,t3.datas lhq 
+from
+(select  id,location_id ,warehouse_id from t_cangkudianwei where lx=1 and id in(select DISTINCT cangkudianwei_id from t_chuanganqi) ORDER BY warehouse_id)ckdw
+LEFT JOIN (select id,wName from t_warehouse) w on w.id=ckdw.warehouse_id
+LEFT JOIN (select id,wName from t_warehouse_location) location ON location.id = ckdw.location_id
+LEFT JOIN
+(select cangkudianwei_id,GROUP_CONCAT(datas) datas from (
+(select id,cangkudianwei_id from t_chuanganqi where lx='o2') o2
+left JOIN
+(select chuanganqi_id,datas from t_chuanganqi_data where cjsj=#{cjsj}
+  ) o2datas on o2.id=o2datas.chuanganqi_id
+)group  by cangkudianwei_id )t1 on t1.cangkudianwei_id=ckdw.id
+
+LEFT JOIN
+(select cangkudianwei_id,GROUP_CONCAT(datas) datas from (
+(select id,cangkudianwei_id from t_chuanganqi where lx='co2') co2
+left JOIN
+(select chuanganqi_id,datas from t_chuanganqi_data where cjsj=#{cjsj}
+  ) co2datas on co2.id=co2datas.chuanganqi_id
+) group  by cangkudianwei_id)t2 on t2.cangkudianwei_id=ckdw.id
+
+lEFT JOIN
+(select cangkudianwei_id,GROUP_CONCAT(datas) datas,cjsj from (
+(select id,cangkudianwei_id from t_chuanganqi where lx='h3p') h3p
+left JOIN
+(select chuanganqi_id,datas,cjsj from t_chuanganqi_data where cjsj=#{cjsj}
+  ) h3pdatas on h3p.id=h3pdatas.chuanganqi_id
+) group  by cangkudianwei_id )t3 on t3.cangkudianwei_id=ckdw.id
+</select>
+<select id="findByPage" resultType="com.zyiot.entity.ChuanGanQiDataFormMap">
+select GROUP_CONCAT(datas) datas,DATE_FORMAT(cjsj,'%Y-%c-%d %H:%i:%s') cjsj,GROUP_CONCAT(lx) lx,wName,wlName from (
+select tcd.*,tc.lx,tc.cangkudianwei_id,tw.wName,twl.wName wlName,tckdw.warehouse_id from 
+(select * from t_chuanganqi_data where chuanganqi_id in(select id from t_chuanganqi where lx in('o2','co2','h3p'))
+<if test="cjsj != null and cjsj != ''">
+ and DATE_FORMAT(cjsj,'%Y-%c-%d') = #{cjsj}
+</if>
+<if test="cjsj == null or cjsj == ''">
+ and date_sub(curdate(), INTERVAL 30 DAY) &lt;= cjsj
+</if>
+) as tcd
+LEFT JOIN (select id,lx,cangkudianwei_id from t_chuanganqi where lx in('o2','co2','h3p')) as tc ON tcd.chuanganqi_id = tc.id
+LEFT JOIN (select id,warehouse_id,location_id from t_cangkudianwei WHERE warehouse_id is not NULL) as tckdw ON tc.cangkudianwei_id = tckdw.id
+LEFT JOIN (select id,wName from t_warehouse) as tw ON tckdw.warehouse_id = tw.id
+LEFT JOIN (select id,wName from t_warehouse_location) as twl ON tckdw.location_id = twl.id
+where 1=1
+<if test="location != null and location != ''">
+ and tckdw.location_id = #{location}
+</if>
+<if test="warehouse != null and warehouse != ''">
+ and tckdw.warehouse_id = #{warehouse}
+</if>
+) as tdata
+GROUP BY tdata.cjsj,tdata.warehouse_id ORDER BY tdata.cjsj DESC,tdata.warehouse_id
+</select>
+<select id="findCangWaiByPage" resultType="com.zyiot.entity.ChuanGanQiDataFormMap">
+select cgqd.datas,DATE_FORMAT(cjsj,'%Y-%c-%d %H:%i:%s') cjsj,ckdw.name,twl.wName from (
+select chuanganqi_id,datas,cjsj from t_chuanganqi_data where chuanganqi_id in(select id from t_chuanganqi where lx = 'h3pW')
+<if test="cjsj != null and cjsj != ''">
+ and DATE_FORMAT(cjsj,'%Y-%c-%d') = #{cjsj}
+</if>
+<if test="cjsj == null or cjsj == ''">
+ and date_sub(curdate(), INTERVAL 30 DAY) &lt;= cjsj
+</if>
+) as cgqd LEFT JOIN (select id,cangkudianwei_id from t_chuanganqi) as cgq ON cgqd.chuanganqi_id = cgq.id
+LEFT JOIN (select id,`name`,location_id from t_cangkudianwei) as ckdw ON cgq.cangkudianwei_id = ckdw.id
+LEFT JOIN (select id,wName from t_warehouse_location) as twl ON ckdw.location_id = twl.id
+<if test="location != null and location != ''">
+ where twl.id= #{location}
+</if>
+ORDER BY cjsj desc, chuanganqi_id
+</select>
+
+<select id="getAllDatas" resultType="com.zyiot.entity.ChuanGanQiDataFormMap">
+select ckName ,GROUP_CONCAT(cgqName) cgqName,GROUP_CONCAT(datas) datas,DATE_FORMAT(cjsj,'%Y-%c-%d %H:%i:%s') cjsj from (select distinct t1.name ckName,t2.lx cgqName,datas,t3.cjsj from (SELECT * FROM `t_cangkudianwei` ) t1 
+inner join
+ (select * from t_chuanganqi) t2 on t1.id=t2.cangkudianwei_id 
+INNER JOIN 
+(select * from t_chuanganqi_data where cjsj =(select cjsj from t_chuanganqi_data order by cjsj desc LIMIT 0,1)) t3 on t2.id=t3.chuanganqi_id) t4 GROUP BY ckName;
+</select>
+
+<select id="find_g_lasttime" resultType="com.zyiot.entity.ChuanGanQiDataFormMap">
+select GROUP_CONCAT(cd.datas)datas ,DATE_FORMAT(cd.cjsj,'%Y-%m-%d %H:%i:%s') cjsj , GROUP_CONCAT(c.lx) lx  ,cl.tongyixinyongdaima ,cl.kuqubianma,cw.cangfangbianhao,cw.huoweibianhao ,ck.id point
+from ((select * from t_chuanganqi_data where cjsj>'${cjsj}' GROUP BY cjsj,chuanganqi_id) cd 
+LEFT JOIN 
+(select * from t_chuanganqi) c 
+	on cd.chuanganqi_id=c.id 
+inner JOIN 
+(select * from t_cangkudianwei where lx='1' and location_id='${location}') ck 
+on c.cangkudianwei_id=ck.id 
+LEFT JOIN
+(select * from t_warehouse) w
+on ck.warehouse_id=w.id 
+LEFT JOIN 
+(SELECT * from t_contrast_location) cl
+on ck.location_id=cl.location_no	
+LEFT JOIN
+(select * from t_contrast_warehouse) cw
+on w.id=cw.warehose_id
+ ) GROUP BY cjsj,w.id order by cjsj desc,lx 
+</select>
+
+<select id="findDataById" resultType="java.lang.String">
+select datas from t_chuanganqi_data where chuanganqi_id = #{0} AND datas != '0.0' ORDER BY cjsj DESC LIMIT 0,1
+</select>
+<select id="getMaxCjsj" resultType="java.lang.String">
+select DATE_FORMAT(MAX(cjsj),'%Y-%c-%d %H:%i:%s') cjsj from t_chuanganqi_data
+</select>
+</mapper>

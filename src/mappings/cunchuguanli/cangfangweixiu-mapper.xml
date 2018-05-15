@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cunchuguanli.CangFangWeiXiuMapper">
+	<sql id="selectsql">
+		twr.id id,
+		tw.wName wName,
+		twl.wName wlName,
+		wId,
+		wrDate,
+		wrWarranty,
+		wrMaturity,
+		wrContent,
+		wrSummary,
+		wrEffect,
+		wrAddDate,
+		wrOperator,
+		version
+	</sql>
+
+	<select id="findByPage" resultType="com.zyiot.entity.cunchuguanli.CangFangWeiXiuFormMap">
+		select
+		<include refid="selectsql"></include>
+		from
+		t_warehouse_repair as twr LEFT JOIN t_warehouse as tw on twr.wId =
+		tw.id LEFT JOIN
+		t_warehouse_location as twl ON tw.wLocation=twl.id
+		where 1=1
+		<if test="waNo !=null and waNo !=''">
+			and tw.id = #{waNo}
+		</if>
+		<if test="wLNo !=null and wLNo !=''">
+			and twl.id = #{wLNo}
+		</if>
+		<if test="orderby !=null and orderby !=''">
+			${orderby}
+		</if>
+	</select>
+	<select id="findCangFangWeiXiuById" resultType="com.zyiot.entity.cunchuguanli.CangFangWeiXiuFormMap">
+		select
+		twr.*,tw.wLocation wLocation from (select * from t_warehouse_repair
+		where id=#{0}) as twr LEFT JOIN
+		(select id,wLocation from t_warehouse) as tw ON twr.wId = tw.id
+	</select>
+</mapper>
+

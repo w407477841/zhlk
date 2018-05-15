@@ -1,0 +1,389 @@
+﻿html{
+	overflow-y:auto;
+	}
+body{
+	width:100%;
+	margin:0 5px 0 0;
+	color:#666;
+	background:url(../images/nybj.png) no-repeat bottom right fixed; 
+	}
+img{
+	border:none;
+	}
+a{
+	text-decoration:none;
+	}
+.red{
+	color:#f00;
+	}
+.green{
+	/*color:#008ee5;
+	*/}
+.blue{
+	color:#00a828;
+	}
+.leftbg{
+	background:url(../images/leftbg.png) no-repeat bottom left;
+	}
+.normal{
+	width:100%;
+	}
+table{
+	white-space:nowrap;
+	word-spacing:normal;
+	}
+table td{
+	white-space:nowrap;
+	}
+.a_s{
+	width:62px;
+}
+.a_sb{
+	width:72px;
+}
+.a_l{
+	width:52px;
+}
+.a_xx{
+	width:92px;
+}
+.a_ll{
+	width:40px;
+}
+.a_lxl{
+	width:30px;
+}
+	
+/*椤堕儴鏍峰紡*/	
+
+.top td.tdl{
+	background:url(../images/headl.jpg) no-repeat;
+	}
+.top td.tdl div.lp{
+	width:585px;
+	height:23px;
+	margin:129px 0 0;
+	padding-left:65px;
+	padding-top:20px;
+	background:url(../images/user.jpg) no-repeat;
+	}
+.top td div.sn{
+	width:672px;
+	height:171px;
+	background:url(../images/headrig.jpg) no-repeat;
+	float:right;
+	margin-right:40px;
+	}
+.top td div.sn div.t1{
+	float:right;
+	margin:0px;
+	width:186px;
+	height:26px;
+	line-height:26px;
+	text-align:center;
+	background:url(../images/tp.gif) no-repeat;
+	}
+.top td div.sn div.t1 a{
+	color:#000;
+	}
+.top td div.sn div.time{
+	width:672px;
+	height:43px;
+	float:right;
+	margin-top:0px;
+	background:url(../images/time.jpg) no-repeat;
+	}
+.top td div.sn div.time div.show{
+	width:245px;
+	float:right;
+	margin:0px;
+	height:26px;
+	line-height:26px;
+	color:#fff;
+	text-align:center;
+	font-size:12px;
+	}
+
+/*sider 鏍峰紡*/
+table.ileft{
+	padding-left:6px;
+	}
+	
+/*鍐呭鍖烘牱寮�*/
+table{
+	font-size:14px;
+	border-collapse:collapse;
+	empty-cells:show;
+	}
+table tr.bg{
+	border:1px solid #c7e3ff;
+	background:url(../images/cpbg.png) repeat-x;
+	}
+td p{
+	margin-left:20px;
+}
+table tr.bg div.btj{
+	height:30px;
+	margin:0 1px;
+	background:url(../images/lin.png) left 10px center no-repeat;
+	padding-left:18px;
+	line-height:30px;	
+}
+div.tiaoz{
+	height:29px;
+	border:1px solid #c7e3ff;
+	border-top:none;
+	background:url(../images/cpbg.png) repeat-x;
+	text-align:center;
+	line-height:29px;
+}
+div.tiaoz a{
+	color:#222;
+}
+td select{
+	width:120px;
+	}
+table.con{
+	text-align:center;
+	line-height:33px;
+	border:1px solid #E3E3E3;
+	}
+table.con_1{
+	text-align:center;
+	line-height:33px;
+	border:1px solid #E3E3E3;
+	}	
+
+table.con_new{
+	line-height:33px;
+	border:1px solid #E3E3E3;
+	}
+table.con_new td{
+	padding-left:60px;
+	}
+table p.cap{
+	float:left;
+	margin:6px 0px;
+	padding:0px;
+	}
+table input.btn{
+	float:right;
+	margin-right:16px;
+	background:url(../images/btnbg.png) no-repeat left top;
+	width:80px;
+	height:24px;
+	text-align:center;
+	border:none;
+	color:#666;
+	cursor:pointer;
+	margin-top:2px;
+	}
+table.con tr.caption{
+	height:33px;
+	background:url(../images/cpbg.png) repeat;
+	background-color:#F3F3F3;
+	}
+table.con thead.caption{
+	height:33px;
+	background:url(../images/cpbg.png) repeat;
+	background-size:100% 100%;
+	}	
+table.con td.bor, table.con_new td.bor{
+	border-right:1px solid #E3E3E3;
+	border-bottom:1px solid #E3E3E3;
+	}
+table.con td.rbor, table.con_new td.rbor{
+	border-right:1px solid #E3E3E3;
+	}
+table.con td.bbt, table.con_new td.bbt{
+	border-bottom:1px solid #E3E3E3;
+	}
+table.con td.ms{
+	background:#F3F3F3;
+	overflow:hidden;
+	}
+table.con td.ms div {
+	margin:20px 10px;
+	height:410px;
+	background:url(../images/map.jpg) no-repeat;
+	} 
+.close_btn{
+	width:80px;
+	height:24px;
+	text-align:center;
+	margin-top:4px;
+	}
+.tablebg{
+	background-color:#ffffff;
+	}
+tr.font{
+	color:#0099FF;
+	font-weight:bold;
+	}
+input.search, input.bttn{
+	background:url(../images/ser.png) no-repeat;
+	}
+input.search{
+	width:134px;
+	padding-top:4px;
+	height:15px;
+	padding-left:6px;
+	float:left;
+	color:#666;
+	border:none;
+	background-position:0 0;
+	}
+input.bttn{
+	width:20px;
+	height:20px;
+	margin:0px;
+	border:none;
+	float:left;
+	background-position:-140px 0;
+	}
+.st{
+	float:left;
+	margin:6px 0 0;
+	}
+
+
+
+/*涓嬫媺妗嗘牱寮�*/
+.selectbox, .selectbox_s{
+	float:left;
+	height:24px;
+	width:140px;
+	margin-top:3px;
+	}
+.selectbox{
+	margin-left:10px;
+}
+.selectbox p, .selectbox_s p{
+	float:left;
+	margin:0px;
+	line-height:20px;
+	padding:0px;
+	}
+.jias{
+	float:left;
+	margin:0;
+	height:24px;
+	line-height:24px;
+	white-space:nowrap;
+	}
+.jias div.mod{
+	float:left;
+	margin:0;
+	padding:0;
+	overflow:hidden;
+}
+.jias div.mod ul{
+	margin:0;
+	padding:0;
+	overflow:hidden;
+}
+.jias div.mod ul li{
+	float:left;
+	list-style:none;
+	margin:0 5px 0 0;
+	border:1px solid #d3dde3;
+}
+.jias div.mod ul li div{
+	margin:0 1px;
+	background:url(../images/ulist.jpg) repeat-x;
+}
+.jias div.mod ul li div a{
+	height:24px;
+	line-height:24px;
+	color:#000;
+	display:inline-block;
+	text-align:center;
+}
+.jias div.te_xt{
+	float:left;
+	margin:0 10px 0 0;
+	padding:0;
+}
+
+.bow{
+	margin:10px 0 10px 20px;
+	float:left;
+}
+.bow input.norbtn, .bow input.jiabtn{
+	height:24px;
+	width:50px;
+	margin:0;
+	font-size:14px;
+	display:block;
+	text-align:center;
+	background:url(../images/ulist.jpg) repeat-x;
+	border:1px solid #ededed;
+}
+
+
+
+
+/*button闆�*/
+.btnji{
+	margin:5px 0 10px;
+	overflow:hidden;
+	white-space:nowrap;
+}
+.btnji ul{
+	width:1190px;
+	margin:0 0 0 10px;
+	padding:0;
+	overflow:hidden;
+	white-space:nowrap;
+}
+.btnji ul li{
+	float:left;
+	list-style:none;
+	margin:0 5px 0 0;
+	border:1px solid #d3dde3;
+}
+.btnji ul li div{
+	margin:0 1px;
+	background:url(../images/ulist.jpg) repeat-x;
+}
+.btnji ul li div a{
+	height:24px;
+	line-height:24px;
+	color:#000;
+	display:inline-block;
+	text-align:center;
+}
+
+
+
+
+	
+/*鑴氭敞鏍峰紡*/
+.footer{
+	width:100%;
+	height:38px;
+	font-size:12px;
+	padding-top:10px;
+	text-align:center;
+	color:#666;
+	background:url(../images/foot.jpg) repeat-x;
+	}
+.footer .fonts{
+	font-size:11px;
+	font-family:Arial, Helvetica, sans-serif;
+	}
+	
+	
+	
+/*婊氬姩鏉℃牱寮�*/
+html{
+	scrollbar-face-color:#fff;                               /*婊氬姩鏉′寒杈规棰滆壊*/
+	scrollbar-highlight-color:#fff;							/*3D鐣岄潰棰滆壊*/
+	scrollbar-3dlight-color:#F3F3F3;                            /*3D琛ㄩ潰棰滆壊*/
+	scrollbar-darkshadow-color:#F3F3F3;
+	scrollbar-Shadow-color:#F3F3F3;
+	scrollbar-arrow-color:#F3F3F3;								/*绠ご棰滆壊*/
+	scrollbar-track-color:#F3F3F3;	
+	
+	
+}

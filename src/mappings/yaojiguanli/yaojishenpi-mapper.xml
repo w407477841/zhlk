@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.yaojiguanli.YaoJiShenPiMapper">
+<sql id="selectId">
+t_medicament_auditing.id id,
+maBill,
+maAuditor,
+maAuditingDate,
+maResult,
+maOpinion,
+userName
+</sql>
+<select id="findByPage" resultType="com.zyiot.entity.yaojiguanli.YaoJiShenPiFormMap">
+
+select <include refid="selectId"></include> from t_medicament_auditing,t_user where t_medicament_auditing.maAuditor = t_user.id
+<if test="maBill !=null and maBill !=''">
+and maBill like '%${maBill}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findYaoJiShenPiById" resultType="com.zyiot.entity.yaojiguanli.YaoJiShenPiFormMap">
+select <include refid="selectId"></include> from t_medicament_auditing where id=#{0}
+</select>
+</mapper>
+

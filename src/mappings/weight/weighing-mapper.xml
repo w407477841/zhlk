@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.weight.WeighingMapper">
+<select id="findByPage" resultType="com.zyiot.entity.weight.WeighingFormMap">
+select * from t_weight_weighing where 1=1
+<if test="bId !=null">
+ and bId='${bId}'
+</if>
+</select>
+<select id="findCanUpdateByPage" resultType="com.zyiot.entity.weight.WeighingFormMap">
+select * from t_weight_weighing as tww where EXISTS(select twrh.bId from t_weight_report_harbor as twrh where twrh.bId = tww.bId AND
+( payStatus = '待结算' or payStatus IS NULL))
+<if test="bId !=null and bId != ''">
+ and tww.bId='${bId}'
+</if>
+<if test="orderby !=null and orderby != ''">
+${orderby}
+</if>
+</select>
+
+<select id="findWeighingById" resultType="com.zyiot.entity.weight.WeighingFormMap">
+select * from t_weight_weighing where id=#{0}
+</select>
+<select id="findWeighingByBId" resultType="com.zyiot.entity.weight.WeighingFormMap"  parameterType="java.lang.String">
+select * from t_weight_weighing where bId=#{0}
+</select>
+<select id="findWeighingByWeighing" resultType="com.zyiot.entity.weight.WeighingFormMap">
+select * from t_weight_weighing where 1=1
+<if test="bId !=null  and bId != ''">
+ and bId='${bId}'
+</if>
+<if test="carId !=null and carId != ''">
+ and carId='${carId}'
+</if>
+<if test="grossWeight !=null and grossWeight != ''">
+ and grossWeight='${grossWeight}'
+</if>
+<if test="tare !=null and tare != ''">
+ and tare='${tare}'
+</if>
+<if test="grossWeightDate !=null and grossWeightDate != ''">
+ and grossWeightDate='${grossWeightDate}'
+</if>
+<if test="tarDate !=null and tarDate != ''">
+ and tarDate='${tarDate}'
+</if>
+ order by id desc limit 0,1
+</select>
+
+<select id="findLastWeighingByBIdAndCarId" resultType="com.zyiot.entity.weight.WeighingFormMap"  parameterType="java.lang.String">
+select * from t_weight_weighing where bId=#{0} and carId=#{1} order by id desc limit 0,1 
+</select>
+
+<select id="getTotalWeightByBId" resultType="com.zyiot.entity.weight.WeighingFormMap"  parameterType="java.lang.String">
+select bId,carId,IFNULL(SUM(grossWeight),0) as totalGrossWeight,COUNT(grossWeight) grossWeightCount,IFNULL(SUM(tare),0) totalTare,COUNT(tare) tarCount
+from 
+t_weight_weighing where bId=#{0} GROUP BY carId
+</select>
+
+<select id="findRetailWeightByPage" resultType="com.zyiot.entity.weight.WeighingFormMap">
+select twrh.id,twrh.bId,userName,grainVariety,trueWeight,buyPrice/50 buyPrice,tww.grossWeight,tww.tare 
+from 
+t_weight_report_harbor as twrh,
+t_weight_weighing as tww 
+where 
+twrh.bId = tww.bId and 
+twrh.printCount &lt; 2 and 
+twrh.usedCar='2' AND
+twrh.payType is null
+order by twrh.bId desc
+</select>
+
+<select id="findUsedCarWeightByPage" resultType="com.zyiot.entity.weight.WeighingFormMap">
+select twrh.userName,twrh.grainVariety,twrh.buyPrice/50 buyPrice,tww.* from 
+(select bId,userName,grainVariety,buyPrice from t_weight_report_harbor where printCount &lt; 2 and usedCar='1' and (payStatus IS NULL OR payStatus = '待结算')) as twrh,
+(select bId,carId,SUM(grossWeight) as grossWeight,COUNT(grossWeight) as grossWeightCount,SUM(tare)as tare,COUNT(tare) as tareCount from t_weight_weighing GROUP BY bId,carId) as tww
+where twrh.bId=tww.bId ORDER BY twrh.bId DESC
+</select>
+
+<select id="findAllWeighingByBIdAndCarId" resultType="com.zyiot.entity.weight.WeighingFormMap"  parameterType="java.lang.String">
+select * from t_weight_weighing where bId=#{0}  and carId = #{1} ORDER BY id DESC
+</select>
+<select id="findWeighingByAttr" resultType="com.zyiot.entity.weight.WeighingFormMap"  parameterType="java.lang.String">
+select id,grossWeight,carId,tare from t_weight_weighing where 1=1 
+<if test="bId != null and bId != ''">
+ and bId = #{bId}
+</if>
+<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+and (grossWeightDate between #{beginDate} and #{endDate}
+or tarDate between #{beginDate} and #{endDate})
+</if>
+order by id
+</select>
+</mapper>

@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.weight.ReportHarborMapper">
+<select id="findByPage" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select twrh2.*,tw.wName,twl.wName wlName from (
+select id,bId,userName,IDCard,usedCar,inOrOut,cardId,address,phoneNumber,shipId,wId,grainProperty,grainVariety from t_weight_report_harbor as twrh where not EXISTS( select tww.bId from t_weight_weighing as tww where tww.bId = twrh.bId) and twrh.addRecord = '2'
+<if test="bId !=null and bId !=''">
+ and twrh.bId = ${bId}
+</if>
+<if test="isChecked !=null and isChecked !=''">
+ and twrh.isChecked = ${isChecked}
+</if>
+) as twrh2 LEFT JOIN t_warehouse as tw ON twrh2.wId = tw.id 
+LEFT JOIN t_warehouse_location as twl ON tw.wLocation = twl.id
+<if test="orderby !=null and orderby !=''">
+ ${orderby}
+</if>
+</select>
+
+<select id="findAllByPage" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select twrh.id,bId,userName,IDCard,address,phoneNumber,shipId,wId,grainProperty,grainVariety,wName,inOrOut,usedCar
+from 
+t_weight_report_harbor as twrh,
+t_warehouse as tw
+where twrh.wId = tw.id
+<if test="bId !=null and bId !=''">
+ and twrh.bId = ${bId}
+</if>
+<if test="orderby !=null and orderby !=''">
+ ${orderby}
+</if>
+</select>
+
+<select id="findAllCheckByPage" resultType="com.zyiot.entity.weight.QualityCheckFormMap">
+select twqc.*,otherReduce,totalReduce from t_weight_report_harbor as twrh,t_weight_quality_check as twqc where twrh.bId = twqc.bId
+and (payStatus = '待结算' or payStatus IS NULL)
+<if test="bId !=null and bId !=''">
+ and twqc.bId = ${bId}
+</if>
+<if test="orderby !=null and orderby !=''">
+ ${orderby}
+</if>
+</select>
+<select id="findSettleAccountByPage" resultType="com.zyiot.entity.weight.QualityCheckFormMap">
+select * from t_weight_report_harbor where 1 = 1
+<if test="payStatus !=null and payStatus !=''">
+ and payStatus = #{payStatus}
+</if>
+<if test="bId !=null and bId !=''">
+ and bId = #{bId}
+</if>
+<if test="orderby !=null and orderby !=''">
+ ${orderby}
+</if>
+</select>
+<select id="findAdditionalByPage" resultType="com.zyiot.entity.weight.QualityCheckFormMap">
+select * from t_weight_report_harbor where addRecord = '1'
+<if test="bId !=null and bId !=''">
+ and bId = ${bId}
+</if>
+<if test="orderby !=null and orderby !=''">
+ ${orderby}
+</if>
+</select>
+<select id="findReportHarborById" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select * from t_weight_report_harbor where id=#{0}
+</select>
+<select id="findReportHarborByBId" resultType="com.zyiot.entity.weight.ReportHarborFormMap" parameterType="java.lang.String">
+select * from t_weight_report_harbor where bId=#{0}
+</select>
+<select id="findNotCheckReportHarborByBId" resultType="com.zyiot.entity.weight.ReportHarborFormMap" parameterType="java.lang.String">
+select 
+twrh.*,
+tw.wName,
+twl.wName as wlName
+from 
+(select id,bId,userName,IDCard,address,phoneNumber,shipId,wId,grainProperty,grainVariety,isChecked,usedCar,version from t_weight_report_harbor where bId = #{0}) as twrh left join
+t_warehouse as tw on twrh.wId = tw.id  left join
+t_warehouse_location as twl on tw.wLocation = twl.id
+</select>
+<select id="findReportHarborByCardId" resultType="com.zyiot.entity.weight.ReportHarborFormMap" parameterType="java.lang.String">
+select * from t_weight_report_harbor where cardId=#{0}
+</select>
+<select id="findIsCheckByCardId" resultType="com.zyiot.entity.weight.ReportHarborFormMap" parameterType="java.lang.String">
+select twrh.bId,twqc.rz from (select bId from t_weight_report_harbor where cardId=#{0}) as twrh LEFT JOIN
+t_weight_quality_check as twqc ON twrh.bId = twqc.bId
+
+</select>
+<select id="getMaxBId" resultType="java.lang.String">
+select MAX(bId) from t_weight_report_harbor where left(bId,8) = #{0}
+</select>
+<select id="printReportHarborByBId" resultType="com.zyiot.entity.weight.ReportHarborFormMap" parameterType="java.lang.String">
+select twrh.bId,twrh.inOrOut,twrh.userName,twrh.IDCard,twrh.shipId,twrh.grainVariety,twrh.addDate,tw.wName,twl.wName as wlName from
+ t_weight_report_harbor as twrh ,
+t_warehouse as tw,
+t_warehouse_location as twl 
+where 
+twrh.bId = #{0} AND 
+twrh.wId = tw.id AND
+tw.wLocation = twl.id
+</select>
+
+<select id="findDetailReportHarborByBId" resultType="com.zyiot.entity.weight.ReportHarborFormMap" parameterType="java.lang.String">
+select 
+twrh.userName,
+twrh.IDCard,
+twrh.address,
+twrh.shipId,
+twrh.grainVariety,
+twrh.grossWeight,
+twrh.tare,
+twrh.otherReduce,
+twrh.totalReduce,
+twrh.trueWeight,
+twrh.totalWeight,
+twrh.buyPrice,
+twrh.sumMoney,
+twrh.inOrOut,
+twrh.weightAuthor,
+twrh.checker,
+twrh.payAuthor,
+twqc.*,
+tw.wName
+ from 
+t_weight_report_harbor as twrh,
+t_weight_quality_check as twqc,
+t_warehouse tw 
+where 
+twrh.bId=#{0} 
+AND twrh.bId = twqc.bId 
+AND twrh.wId = tw.id
+</select>
+
+<select id="findDetailReportHarborById" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select 
+twrh.id,
+twrh.version,
+bId,
+userName,
+IDCard,
+address,
+phoneNumber,
+shipId,
+grainProperty,
+grainVariety,
+buyPrice,
+grossWeight,
+tare,
+wId,
+totalReduce,
+totalWeight,
+trueWeight,
+payPlanId,
+sumMoney,
+checker,
+weightAuthor,
+addDate,
+weightEndDate,
+inOrOut,
+tw.wName,
+twl.wName as wlName
+from 
+(select * from t_weight_report_harbor where id = #{0}) as twrh left join
+t_warehouse as tw on twrh.wId = tw.id  left join
+t_warehouse_location as twl on tw.wLocation = twl.id
+</select>
+<select id="findBasicReportHarborById" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select twrh.id,bId,userName,reportDate,IDCard,address,phoneNumber,shipId,wId,grainProperty,grainVariety,inOrOut,usedCar,wLocation,twrh.version
+from 
+t_weight_report_harbor as twrh,
+t_warehouse as tw
+where twrh.wId = tw.id
+and twrh.id=#{0}
+</select>
+
+<select id="findCheckReportHarborById"  resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select twqc.*,
+otherReduce,
+totalReduce,
+buyPrice,
+wId,
+grainVariety,
+grainProperty 
+from 
+t_weight_report_harbor as twrh,
+t_weight_quality_check as twqc 
+where 
+twrh.bId = twqc.bId AND
+twqc.id=#{0}
+</select>
+
+<select id="findPayPlanIdByWId" resultType="java.lang.String" parameterType="java.lang.String">
+select payPlanId from t_weight_report_harbor where wId = #{0} AND payPlanId IS NOT NULL order by payDate desc limit 0,1
+</select>
+<select id="shijiduijie" resultType="com.zyiot.entity.weight.ReportHarborFormMap" parameterType="java.lang.String">
+SELECT
+	*
+FROM
+	(
+		SELECT
+			twgv.id grainKind,
+			twgp.id grainAttribute,
+			tcl.kuqubianma orgCode,
+			tcl.tongyixinyongdaima entCode,
+			tcw.cangfangbianhao storehouse,
+			tcw.huoweibianhao house,
+			twrh.bId inOutID,
+			CASE twrh.inOrOut
+		WHEN '1' THEN
+			'00'
+		WHEN '2' THEN
+			'01'
+		END AS inOutType,
+		CONCAT(
+			LEFT (
+				REPLACE (
+					REPLACE (
+						REPLACE (twrh.addDate, '-', ''),
+						' ',
+						''
+					),
+					':',
+					''
+				),
+				8
+			),
+			'000000'
+		) date,
+		twrh.totalWeight netWeight,
+		twrh.trueWeight settleWeight,
+		twrh.isAdd,
+		twrh.buyPrice / 50 unitPrice,
+		twrh.sumMoney settleMoney,
+		twrh.totalReduce deductWeight,
+		twqc. LEVEL grade,
+		twrh.userName customer,
+		'' allocation,
+		twrh.IDCard IDcardNo,
+		twrh.shipId plateNumber,
+		twrh.grossWeight grossWeight,
+		twrh.tare tareWeight,
+		'' DBarCode,
+		'' URL,
+		CONCAT(
+			'[{item:''020101'',',
+			'value:''',
+			twqc.sf,
+			'''},',
+			'{item:''01010301'',',
+			'value:''',
+			twqc.zz,
+			'''},',
+			'{item:''01010701'',',
+			'value:''',
+			twqc.rz,
+			'''},',
+			'{item:''01010401'',',
+			'value:''',
+			twqc.bwsld,
+			'''},',
+			'{item:''01010304'',',
+			'value:''',
+			twqc.kwz,
+			'''},',
+			'{item:''010101'',',
+			'value:''',
+			twqc.szqw,
+			'''},',
+			'{item:''040302'',',
+			'value:''',
+			twqc.bwsld,
+			'''},',
+			'{item:''01012104'',',
+			'value:''',
+			twqc.zjml,
+			'''},',
+			'{item:''01012102'',',
+			'value:''',
+			twqc.hlm,
+			'''},',
+			'{item:''01012103'',',
+			'value:''',
+			twqc.gwcm,
+			'''},',
+			'{item:''01010201'',',
+			'value:''',
+			twqc.hh,
+			'''}]'
+		) items,
+		DATE_FORMAT(
+
+			IF (
+				twrhh.execDate IS NULL,
+				twrh.addDate,
+				twrhh.execDate
+			),
+			'%Y-%m-%d %H:%i:%s'
+		) execDate
+	FROM
+		t_weight_report_harbor AS twrh
+	LEFT JOIN t_weight_grain_variety AS twgv ON twrh.grainVariety = twgv.text
+	LEFT JOIN t_weight_grain_property AS twgp ON twrh.grainProperty = twgp.text
+	LEFT JOIN t_warehouse AS tw ON twrh.wId = tw.id
+	LEFT JOIN t_contrast_location AS tcl ON tw.wLocation = tcl.location_no
+	LEFT JOIN t_contrast_warehouse AS tcw ON twrh.wId = tcw.warehose_id
+	LEFT JOIN t_weight_quality_check AS twqc ON twrh.bId = twqc.bId
+	LEFT JOIN (
+		SELECT
+			bId,
+			max(execDate) execDate
+		FROM
+			t_weight_report_harbor_his
+		GROUP BY
+			bId
+	) twrhh ON twrh.bId = twrhh.bId
+	) AS t
+WHERE
+	t.execDate > #{0}
+</select>
+<select id="findLastByWId" resultType="com.zyiot.entity.weight.QualityCheckFormMap">
+select * from t_quality_manager WHERE qualityType = '3' AND wId = #{0} ORDER BY checkDate DESC LIMIT 0,1
+</select>
+
+<select id="findPrintByPage" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select twrh2.*,tw.wName,twl.wName wlName from (
+select id,bId,userName,IDCard,usedCar,inOrOut,cardId,address,phoneNumber,shipId,wId,grainProperty,grainVariety from t_weight_report_harbor as twrh where 1=1
+<if test="bId !=null and bId !=''">
+ and twrh.bId = ${bId}
+</if>
+<if test="isChecked !=null and isChecked !=''">
+ and twrh.isChecked = ${isChecked}
+</if>
+) as twrh2 LEFT JOIN t_warehouse as tw ON twrh2.wId = tw.id 
+LEFT JOIN t_warehouse_location as twl ON tw.wLocation = twl.id
+<if test="orderby !=null and orderby !=''">
+ ${orderby}
+</if>
+</select>
+</mapper>

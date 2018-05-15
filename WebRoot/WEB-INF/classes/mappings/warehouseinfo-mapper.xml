@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.WarehouseInfoMapper">
+
+<select id="findDateBywarehouseNo" resultType="com.zyiot.entity.WarehouseInfoFormMap">
+select DISTINCT(wDate)
+from t_warehouse_info 
+where wDisable='1' and wWarehouse=#{0} order by wDate desc
+</select>
+<select id="findMaxAndMinValueOfNull" resultType="com.zyiot.entity.WarehouseInfoFormMap">
+select * from t_warehouse_info where maxTemperature is NULL
+</select>
+<update id="bashUpdateMaxAndMin" parameterType="java.util.List">
+  <foreach collection="list" item="item" open="" close="" separator=";">
+    update t_warehouse_info set
+    maxTemperature = ${item.maxTemperature},
+    minTemperature = ${item.minTemperature}
+    where id=${item.id}
+  </foreach>
+</update>
+<select id="findNeedTransformData" resultType="com.zyiot.entity.WarehouseInfoFormMap">
+select 
+twi.id,
+twi.wCoordinate,
+tw.wColumn,
+tw.wHeight,
+tw.wRow
+from 
+t_warehouse_info as twi LEFT JOIN
+t_warehouse as tw
+ON twi.wWarehouse = tw.id
+where twi.id > IFNULL((select MAX(oid) from t_warehouse_info_transform),0)
+</select>
+<select id="findSideAndDataById" resultType="com.zyiot.entity.WarehouseInfoFormMap">
+select 
+twi.wCoordinate,
+twi.cjsj,
+tw.wColumn,
+tw.wHeight,
+tw.wRow
+from 
+t_warehouse_info as twi,
+t_warehouse as tw
+WHERE
+twi.id = #{0} AND
+twi.wWarehouse = tw.id
+</select>
+<select id="findTemperatureTendency" resultType="com.zyiot.entity.WarehouseInfoFormMap">
+select 
+wTemperature,
+gTemperature,
+maxTemperature,
+minTemperature,
+cjsj,
+wWarehouse
+from 
+t_warehouse_info
+WHERE
+wWarehouse = ${wID} AND
+cjsj BETWEEN '${beginDate}' AND '${endDate}' AND
+wTemperature<![CDATA[<=100 ]]> AND
+gTemperature<![CDATA[<=100 ]]> AND
+maxTemperature<![CDATA[<=100 ]]> AND
+minTemperature<![CDATA[<=100 ]]>
+</select>
+
+<select id="findTemperatureAlarm" resultType="com.zyiot.entity.WarehouseInfoFormMap">
+select t_w_i.*,t_w.wHeight,t_w.wColumn,t_w.wRow from (
+
+select twi.id,twi.wWarehouse,twi.cjsj,twi.maxTemperature,twi.wCoordinate from (
+select twi.id from (select id,wWarehouse from t_warehouse_info WHERE id > #{0} ORDER BY id DESC ) as twi GROUP BY twi.wWarehouse
+) as tid LEFT JOIN t_warehouse_info as twi ON
+tid.id = twi.id
+) as t_w_i LEFT JOIN t_warehouse as t_w on t_w_i.wWarehouse = t_w.id
+</select>
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.yaojiguanli.CanZhaChuLiMapper">
+<select id="findByPage" resultType="com.zyiot.entity.yaojiguanli.CanZhaChuLiFormMap">
+select 
+tmd.*,
+tw.wName ,
+twl.wName wlName
+from 
+t_medicament_dispose as tmd,
+t_warehouse as tw,
+t_warehouse_location as twl 
+where
+ tmd.mdWarehouseId = tw.id AND
+tw.wLocation = twl.id
+<if test="wlNo !=null and wlNo !=''">
+and twl.id = #{wlNo}
+</if>
+<if test="wNo !=null and wNo !=''">
+and tw.id = #{wNo}
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findCanZhaChuLiById" resultType="com.zyiot.entity.yaojiguanli.CanZhaChuLiFormMap">
+select 
+tmd.id,
+mdWarehouseId,
+mdFumigateDate,
+mdBeginDate,
+mdNumber,
+mdParticipant,
+mdProcessMode,
+mdOpDate,
+mdDataOperator,
+tmd.version,
+tw.wLocation 
+from t_medicament_dispose as tmd ,t_warehouse as tw where tmd.mdWarehouseId = tw.id and
+tmd.id=#{0}
+</select>
+</mapper>
+

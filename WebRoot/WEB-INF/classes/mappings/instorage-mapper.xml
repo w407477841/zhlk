@@ -1,0 +1,1096 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.StorageMapper">
+<select id="findInstorages" parameterType="java.util.HashMap" resultType="com.zyiot.entity.BusinessPlaneFormMap">
+		SELECT
+		i.basicid,
+		i.ID,
+		i.Owner,
+		i.Identity,
+		i.Phone,
+		i.Address,
+		i.Category,
+		i.Breed,
+		i.Property,
+		i.CarID,
+		i.StorageID,
+		i.useCar,
+		i.State,
+		i.CreateTime,
+		i.PayTime,
+		i.inorout,
+		i.Payway,
+		q.Price,
+		q.AmountPercent
+		
+		FROM
+		w_quality AS q
+		right JOIN w_instorage AS i ON q.ID = i.ID
+		where   i.Payway!=3
+		<if test="id !='' and id!=null ">
+			and i.id=#{id}
+		</if>
+		<if test="createTime !='' and createTime!=null ">
+		  and	DATE_FORMAT(CreateTime, '%Y-%c-%d') = DATE_FORMAT(#{createTime},'%Y-%c-%d')
+		</if>
+		<if test="inorout !='' and inorout!=null and inorout!=99 ">
+			and i.inorout=#{inorout}
+		</if>
+		
+		order by createTime desc
+</select>
+<select id="tweenInstorage" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT
+			i.basicid,
+			i.ID,
+			i. OWNER,
+			i.Breed,
+			c.text Property,
+			i.CarID,
+			i.StorageID,
+			i.CreateTime,
+			i.inorout,
+			q.sf,
+			q.Zz,
+			q.rz,
+			q.CCL,
+			w.TotalWeight - w.CarWeight weights
+		FROM
+			w_instorage i
+		LEFT JOIN w_quality AS q ON q.ID = i.ID
+		LEFT JOIN w_weighting w ON i.id = w.id
+		left join t_codeitem c on c.codeid=11 and c.id=i.property 
+		WHERE
+			i.Payway = 3
+		<if test="id !='' and id!=null ">
+			and i.id=#{id}
+		</if>
+		<if test="location !='' and location!=null ">
+		  and	i.location=#{location}
+		</if>
+		<if test="houseid !='' and houseid != null ">
+			and i.storageid=#{houseid}
+		</if>
+		
+		order by createTime desc
+</select>
+<!-- 搜储系统获取本库的出入库的最新记录 -->
+<select id="findStorages_g_basicid" resultType="com.zyiot.entity.shouchu.StorageFormMap">
+select 
+basicid,ID,Owner,Identity,Phone,Address,Category,Breed,Property,CarID,StorageID,useCar,State,DATE_FORMAT(CreateTime,'%Y-%c-%d %H:%i:%s') CreateTime,DATE_FORMAT(update_time,'%Y-%c-%d %H:%i:%s') update_time,PayTime,inorout,Payway,JSY,location 
+from w_instorage where update_time > '${lasttime}' and location='${location}' and State=3 order by update_time desc
+</select>
+<!-- 搜储系统获取本库的出入库的最新记录 -->
+<select id="findQualist_g_lasttime" resultType="com.zyiot.entity.shouchu.InstorageQualityFormMap">
+select 
+basicid,ID,Bwsld,CCL,Gwcm,Hl,Pcpf,Rl,Szqw,Smj,Sf,Zz,Zjml,Zfsz,Price,AmountPercent,Level,Rz,Kwz,Hh,ZJY,location,date_format(update_time,'%Y-%c-%d %H:%i:%s')update_time 
+from w_quality where update_time > '${lasttime}'   order by update_time desc
+</select>
+
+<!-- 搜储系统获取本库的出入库的最新记录 -->
+<select id="findWeighting_g_lasttime" resultType="com.zyiot.entity.shouchu.WeightingFormMap">
+select 
+basicid,id,CarID,TotalWeight,CarWeight,TotalWeightingTime,CarWeightingTime,Flag,lastweight,Sid,SBY,location,date_format(update_time,'%Y-%c-%d %H:%i:%s')update_time 
+from w_weighting where update_time > '${lasttime}'   order by update_time desc
+</select>
+
+<update id="updateTimeStamp">
+update t_timestamp set lasttime='${lasttime}' where tableName='${tableName}' and location='${location}'
+</update>
+<insert id="addTimeStamp">
+insert into t_timestamp (tableName,location <if test="lasttime!=null and lasttime!=''">,lasttime</if>) values ('${tableName}','${location}'<if test="lasttime!=null and lasttime!=''">,'${lasttime}'</if>);
+</insert>
+<!-- 县级平台获取一个库点的最后记录 -->
+<select id="findMaxBasicidInStorage" resultType="com.zyiot.entity.shouchu.StorageFormMap">
+ select lasttime from t_timestamp where tableName='${tableName}' and location='${location}' 
+</select>
+
+<select id="availableCars" parameterType="java.util.HashMap" resultType="com.zyiot.entity.shouchu.TransportCarFormMap">
+		SELECT * FROM w_transportcar_basic
+</select>
+
+<select id="findStandard" parameterType="java.util.HashMap" resultType="com.zyiot.entity.shouchu.StandardFormMap">
+	select Code,Abbreviation,Promoting,Promote,Reducing,Reduce,Step,Max,Min,Standard,CodeName 
+		from w_quailty_basic_01 where Code LIKE CONCAT('', #{name},'%') order by Code	
+</select>
+
+<select id="findWeightBySid" parameterType="java.util.HashMap" resultType="com.zyiot.entity.shouchu.WeightingFormMap">
+			SELECT
+			w.id,
+			w.basicid,
+			w.sid,
+			w.carid,
+			w.totalWeight,
+			w.carWeight,
+			w.totalWeightingTime,
+			w.carWeightingTime,
+			w.sby,
+			i.inorout
+		FROM
+			w_weighting w
+		left join w_instorage i  on i.id= left(w.id,14)
+		WHERE
+			sid = #{sid}
+</select>
+
+<select id="priceMessage" parameterType="java.util.HashMap" resultType="com.zyiot.entity.shouchu.PriceMessage">
+		SELECT code,name,DiyName,Abbreviation,SalePrice,BuyPrice,StepPrice,Level FROM w_quality_basic where code=#{name};
+</select>
+
+<select id="queryCars" parameterType="java.lang.String" resultType="com.zyiot.entity.shouchu.AvailableCarsFormMap">
+		SELECT
+			t.ID,
+			t.CaNum,
+			t.Model,
+			t.Driver,
+			t.DrivingLcence,
+			t.Phone,
+			t.Inuse
+		FROM
+			w_transportcar_basic AS t
+			
+		<if test="_parameter!=1 ">
+		WHERE
+			t.Inuse = 0
+		</if>
+</select>
+
+<select id="printCars" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT
+		r.instorageid id,
+		t.caNum,
+		t.Model,
+		t.Driver,
+		t.DrivingLcence,
+		t.Phone
+		FROM
+		(
+		SELECT
+		carid,
+		instorageid
+		FROM
+		w_car_relation r
+		WHERE
+		r.instorageid LIKE CONCAT('%',#{id} ,'%')
+		) r
+		LEFT JOIN
+		w_transportcar_basic t ON r.carid = t.id
+</select>
+
+<select id="singleBill" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT
+			i.id,
+			w.Sid sid,
+			OWNER,
+			r.CarID,
+			i.carid vid,
+			ifnull(W.TotalWeight, '') TotalWeight,
+			ifnull(TotalWeightingTime, '') TotalWeightingTime,
+			ifnull(w.CarWeight, '') CarWeight,
+			ifnull(CarWeightingTime, '') CarWeightingTime,
+			q.Price,
+			q.AmountPercent,
+			i.useCar,
+			i.State,
+			i.Payway
+		FROM
+			w_instorage i
+		LEFT JOIN w_weighting w ON i.id = LEFT (w.ID, 14)
+		LEFT JOIN w_quality q ON i.id = q.id
+		LEFT JOIN w_car_relation r ON w.ID = r.instorageid
+		WHERE
+			1 = 1
+		<if test="id!='' and id!=null ">
+			and	r.instorageid=#{id} 
+		</if>
+		<if test="id1!='' and id1!=null ">
+			and	left(w.ID,14 )=#{id1}
+		</if>
+		order by	TotalWeightingTime desc
+	</select>
+	
+	<select id="queryFendianStorage" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select * from (SELECT
+				l.location_no l,
+				w.id h,
+				l.qiyemingcheng location,
+				lo.wName position,
+				w.wName houseid,
+				n.breed,
+				n.property,
+				n.quanZhong,
+				n.sdPrice,
+				ifnull(ww.weight,0) weight,
+				n.sdPrice*ww.weight total
+			FROM
+				t_contrast_location l
+			LEFT JOIN t_warehouse_location lo ON l.location_no = lo.wNo
+			LEFT JOIN t_warehouse w ON w.wLocation = lo.wNo
+			LEFT JOIN (
+				SELECT
+					v.source,
+					v.storageID,
+					v.text breed,
+					c1.text property,
+					v.quanZhong,
+					v. NAME,
+					v.sdPrice
+				FROM
+					(
+						SELECT
+							c.text,
+							f. NAME,
+							f.storageID,
+							f.source,
+							d.sdYear,
+							d.sdPrice,
+							concat(d.sdMoisture, '%') sdMoisture,
+							f.quanZhong
+						FROM
+							t_storag_info f
+						LEFT JOIN t_storage_detail d ON f.id = d.storage_id
+						LEFT JOIN t_codeitem c ON f. NAME = c.id
+						AND (c.codeid = 12)
+						GROUP BY
+							f.storageID,
+							f.source
+					) v
+				LEFT JOIN t_codeitem c1 ON v.quanZhong = c1.id
+				AND c1.codeid = 11
+			) n ON lo.wNo = n.source
+			AND w.id = n.storageID
+			LEFT JOIN (
+				SELECT
+					cangKu weight,
+					source location,
+					storageid storageID
+				FROM
+					t_storag_info GROUP BY source ,storageid
+		) ww ON lo.wNo = ww.location
+			AND ww.storageid =w.id
+			where 1=1) v WHERE v.weight!=0 and v.quanZhong in ('123','2') and v.l!='1000002' 
+		<if test="location!='' and location!=null ">
+			and	v.l in (${location})
+		</if>
+		
+		<if test="location!='' and location!=null  and station!=null and station!='' ">
+			and	v.l in (${station})
+		</if>
+		
+		
+		<if test="storageID!='' and storageID!=null ">
+			and	v.h=#{storageID}
+		</if>
+		
+		<if test="property!='' and property!=null ">
+			and	v.property=#{property}
+		</if>
+		<if test="breed!='' and breed!=null ">
+			and	v.breed=#{breed}
+		</if>
+
+	
+	</select>
+	
+	<select id="queryMonthlyStorage" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select * from (SELECT
+			l.wName locationName,
+			w.wName houseName,
+			n.breed breed,
+			n.sdYear,
+			n.pack,
+			tem.maxTemperature,
+			tem.minTemperature,
+			n.property,
+			n.sdMoisture ,
+			ifnull(sum(m.weight),0)+ifnull((
+			SELECT
+				ifnull(siQuantity, 0)
+			FROM
+				`t_store_info`
+			WHERE
+				location_id = w.wLocation
+			AND warehouse_id = w.id
+			ORDER BY
+				siPutin DESC
+			LIMIT 1
+		),0) weight
+		FROM
+			t_warehouse_location AS l
+		LEFT JOIN t_warehouse AS w ON w.wLocation = l.id
+		LEFT JOIN (
+			SELECT
+				i.id,
+				i.location,
+				i.storageID,
+				sum(w.TotalWeight - w.CarWeight) weight
+			FROM
+				w_instorage i
+			LEFT JOIN w_weighting w ON i.ID = LEFT (w.id, 14)
+			
+			where  1=1 
+			
+			<if test="times!='' and times!=null ">
+			 and  i.createTime between   '1970-01-01' and #{times}
+			</if>
+			
+			GROUP BY
+				i.id
+		) m ON concat(l.wNo, ',', w.id, ',', w.wName) = concat(m.location, ',', m.storageID)
+		LEFT JOIN (
+	select c1.text breed,l.storageid,l.source,ifnull(l.sdMoisture,'--') sdMoisture,ifnull(l.sdYear,'--') sdYear,ifnull(c.text,'--')  property,ifnull(d.sdPrice, '--') sdPrice,
+		CASE d.sdPack
+			WHEN '1' THEN '散装'
+			WHEN '2' THEN '亚麻布包装'
+			WHEN '3' THEN '塑料袋包装'
+			WHEN '4' THEN '铁盒包装'
+			ELSE '散装' END pack from (select l.breed text,substring_index(l.houseid, ',' ,1) storageid,l.location source , concat(l.sf,'%') sdMoisture,l.bornDate sdYear
+	from (select i.breed,i.location,i.houseid,i.bornDate,i.dates,c.text level,q.sf
+					from t_qualitychain_instance_quality i
+				   left join w_quality q on i.qualityid=q.id
+           left join t_codeitem c on c.codeid=10 and c.id=q.level
+           			<if test="times!='' and times!=null ">
+			 where  i.dates between   '1970-01-01' and #{times}
+			</if>
+           
+             order by dates desc) l group by l.houseid  union all
+		SELECT
+				c.text,f.storageID,f.source,concat(d.sdMoisture, '%') sdMoisture,d.sdYear
+				FROM t_storag_info f
+			LEFT JOIN t_storage_detail d ON f.id = d.storage_id
+			LEFT JOIN t_codeitem c ON f. NAME = c.id AND (c.codeid = 12)
+			GROUP BY
+				f.storageID,
+				f.source) l
+	left join t_storag_info f  on  f.source=l.source and f.storageid=l.storageid
+	left join t_storage_detail d on f.id=d.storage_id
+	left join t_codeitem c on c.codeid=11 and c.id=f.quanZhong
+	left join t_codeitem c1 on c1.codeid=12 and c1.id=f.name
+ group by l.source,l.storageid
+		) n ON concat(l.wNo, w.id) = concat(n.source, n.storageID)
+					LEFT JOIN (
+						SELECT
+							*
+						FROM
+							(
+								SELECT
+									maxTemperature,
+									minTemperature,
+									cjsj,
+									wWarehouse houseid
+								FROM
+									t_warehouse_info
+							<if test="times!='' and times!=null ">
+								 WHERE	cjsj between   '1970-01-01' and #{times}
+								</if>
+								ORDER BY
+									cjsj DESC
+							) tem
+						GROUP BY
+							tem.houseid
+					) tem ON tem.houseid = w.id
+		
+		
+		where 1=1 
+		
+		<if test="location!='' and location!=null ">
+			and	l.wNo in (${location})
+		</if>
+		
+		<if test="location!='' and location!=null  and station!=null and station!='' ">
+			and	l.wNo in (${station})
+		</if>
+		
+		<if test="storageID!='' and storageID!=null ">
+			and	w.id=#{storageID}
+		</if>
+		
+		<if test="year!='' and year!=null ">
+			and	n.sdYear=#{year}
+		</if>
+		
+		<if test="property!='' and property!=null ">
+			and	n.property=#{property}
+		</if>
+		<if test="breed!='' and breed!=null ">
+			and	n.breed=#{breed}
+		</if>
+		<if test="pack!='' and pack!=null ">
+			and	n.pack=#{pack}
+		</if>
+		GROUP BY
+			w.id) v where v.weight!=0
+			
+	</select>
+	
+<select id="totalDetail" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	SELECT
+		i.id,
+		i. OWNER,
+		i.Identity,
+		i.Phone,
+		c.text,
+		l.wName,
+		substring_index(i.StorageID, ',' ,- 1) StorageID,
+		i.Property,
+		concat(q. LEVEL, '级') LEVEL,
+		concat(q.amountPercent, '%') amountPercent,
+		concat(q.price / 100, '元/KG') price,
+		q.rz,
+		q.sf,
+		q.zz,
+		ifnull(q.kwz, '--') kwz,
+		ifnull(q.Bwsld, '--') Bwsld,
+		ifnull(q.zjml, '--') zjml,
+		ifnull(q.gwcm, '--') gwcm,
+		ifnull(q.hl, '--') hl,
+		ifnull(q.hh, '--') hh
+	FROM
+		w_instorage i
+	LEFT JOIN t_warehouse_location l ON i.location = l.wNo
+	LEFT JOIN w_quality q ON i.id = q.id
+	LEFT JOIN t_codeitem c ON c.codeid = 12
+	AND c.id = i.Breed
+	WHERE
+		 i.id=left(#{id},14)
+	</select>
+	
+	
+<select id="findStorageByPage" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	select 
+(select text from t_codeitem where codeid='12' and id=t1.name) name  ,
+code,
+(select text from t_codeitem where codeid='11' and id=t1.quanZhong) quanZhong,
+cangKu,
+(select wName from t_warehouse where id=t1.storageID) storageID,
+(select wName from t_warehouse_location where wNo=t1.source)source,
+t1.id id, 
+(select text from t_codeitem where codeid='10' and id=t2.sdLevel ) sdLevel,
+t2.sdMoisture sdMoisture,
+t2.sdImpurity sdImpurity,
+t2.sdUnitweight sdUnitweight,
+t2.sdUnsoundgrain sdUnsoundgrain,
+t2.sdYellowrice sdYellowrice,
+t2.sdHeadricerate sdHeadricerate,
+t2.sdBrownricerate sdBrownricerate,
+'0' version,
+t2.sdHuskedriceinpeddy sdHuskedriceinpeddy 
+
+from t_storag_info t1 
+left join (
+select * from (select * from (select i.location, substring_index(i.houseid, ',' ,1) houseid,q.sf sdMoisture,q.zz sdImpurity,q.rz sdUnitweight,q.bwsld sdUnsoundgrain,q.hl sdYellowrice,q.zjml sdHeadricerate,q.ccl sdBrownricerate, q.level sdLevel,q.gwcm sdHuskedriceinpeddy 
+from t_qualitychain_instance_quality i
+left join w_quality q on i.qualityid=q.id
+left join t_codeitem c on c.codeid=10 and c.id=q.level
+order by dates desc) l group by l.houseid
+union all
+select i.source,i.storageid,d.sdMoisture ,d.sdImpurity,d.sdUnitweight,d.sdUnsoundgrain,d.sdYellowrice,d.sdHeadricerate,d.sdBrownricerate,d.sdHuskedriceinpeddy,d.sdLevel
+from t_storag_info i left join t_storage_detail d on i.id=d.storage_id) l group by l.location,l.houseid
+) t2 on t1.source=t2.location and t1.storageid=t2.houseid
+ where 1=1
+
+<if test="source!=null and source!=''">
+and t1.source ='${source}'
+</if>
+<if test="storageID!=null and storageID!=''">
+and t1.storageID='${storageID}'
+</if>
+<if test="id!=null and id!=''">
+and t1.id=${id}
+</if>
+	</select>		
+	
+<select id="totalBill" resultType="java.util.HashMap">
+	SELECT * FROM (SELECT
+		LEFT(id, 14) id,
+		SUM(TotalWeight) TotalWeight,
+		SUM(CarWeight) CarWeight,
+		COUNT(*) count
+		FROM
+		w_weighting
+		WHERE
+		LEFT(id, 14) IN (SELECT
+		id
+		FROM
+		w_instorage
+		)
+		GROUP BY LEFT(id, 14)) t
+		LEFT JOIN
+		w_instorage i
+		ON t.id = i.id
+		LEFT JOIN
+		w_quality_basic b ON i.Breed = b.Code
+		ORDER BY CreateTime DESC
+	</select>
+	
+<select id="showInstorages" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT ID id,
+		Owner owner,
+		Identity identity,
+		Address address,
+		Category
+		category,
+		Breed breed,
+		Property property,
+		CarID carid,
+		StorageID
+		storageid,
+		useCar usercar,
+		State state,
+		CreateTime createTime,
+		PayTime,
+		paytime,
+		Phone phone,
+		inorout ,
+		Payway
+		FROM w_instorage
+		where 1=1
+		<if test="search_id!='' and search_id!=null ">
+			and	id=#{search_id}
+		</if>
+		
+		<if test="search_time!='' and search_time!=null ">
+			and		DATE_FORMAT(CreateTime, '%Y-%c-%d') = DATE_FORMAT(#{search_time},'%Y-%c-%d')
+		</if>
+		
+		<if test="flag!='' and flag!=null ">
+			and	id=left(#{id},14)
+		</if>
+		
+		<if test="sid!='' and sid!=null ">
+			and	storageid=#{sid}
+		</if>
+		order by createTime desc
+	</select>
+	
+	
+<select id="weightingcount" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT sum(lastweight) COUNT FROM w_weighting where 1=1 
+		
+		<if test="flag!='' and flag!=null ">
+		 and id=#{id}
+		</if>
+		
+		<if test="flag==null or flag=='' ">
+		and left(id,14)=left(#{id},14)
+		</if>
+
+	</select>
+	
+	
+<select id="forid" parameterType="java.lang.String" resultType="java.lang.Integer">
+	SELECT count(*) ifexist FROM `w_instorage` where id=#{id}
+	</select>
+	
+<select id="validation" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT * FROM w_car_relation where instorageid=#{id}
+	</select>
+	
+<select id="splineData" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT i.id,i.PayTime time,abs(sum(w.TotalWeight-w.CarWeight)) weight,i.inorout FROM  w_weighting w
+		 left join w_instorage i on i.id= left(w.id,14)
+		where  i.State=3  group by i.id order by i.PayTime asc
+	</select>
+	
+	
+<select id="applySettings" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select parameterKey,parameterValue from w_setting where 1=1
+		<if test=" location!='' and location!=null  and  number!='' and number!=null ">
+			 and location=#{location} and number=#{number}
+		</if>
+		<if test=" code!='' and code!=null">
+			and parameterKey=#{code}
+		</if>
+	</select>
+<select id="allSettings" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+			SELECT
+			w.parameterKey,
+			w.number,
+			l.wName
+			FROM
+			w_setting AS w ,
+			t_warehouse_location AS l
+			WHERE
+			w.location = l.wNo
+	</select>
+
+	<insert id="saveDiBangData" parameterType="java.util.HashMap">
+		INSERT INTO w_setting
+		(location,number,parameterValue) VALUES (#{location},#{number},#{_value})
+	</insert>
+	<update id="updateDiBangData" parameterType="java.util.HashMap">
+		update w_setting set
+		parameterValue=#{_value} where  location=#{location} and number=#{number}
+	</update>
+	
+
+<select id="weightingList" parameterType="java.lang.String" resultType="com.zyiot.entity.shouchu.WeightingFormMap">
+		SELECT
+		basicid,
+		id,
+		carid,
+		TotalWeight,
+		CarWeight,
+		TotalWeightingTime,
+		CarWeightingTime,
+		flag,
+		lastweight
+		FROM
+		w_weighting where id=#{id} and
+		flag=0
+	</select>
+	
+<select id="carcount" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT count(*) COUNT FROM w_car_relation where
+		left(instorageid,14)=left(#{id},14)
+	</select>
+	
+<select id="instanceAmount" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT
+		l.wNo,
+		l.wName,
+		sum(w.totalWeight)-sum(w.carWeight) weight
+		FROM
+		w_instorage i
+		left JOIN w_weighting w ON LEFT (w.id, 14) = i.id 
+		left join t_warehouse_location l on  i.location=l.wNo
+		GROUP BY i.location
+	</select>
+	
+	
+<select id="quailtyDetail" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT
+			c.text breed,
+			i.createTime,
+			i.carID,
+			w.weight,
+		q.*
+		FROM
+			w_instorage i
+		LEFT JOIN w_quality q ON i.id = q.id
+		LEFT JOIN (
+			SELECT
+				LEFT (id, 14) id,
+				sum(totalWeight) - sum(carWeight) weight
+			FROM
+				w_weighting
+			GROUP BY
+				LEFT (id, 14)
+		) w ON w.id = i.id
+		LEFT JOIN t_codeitem c ON c.codeid = 12
+		AND i.breed = c.id 
+		
+		<if test="inorout!='' and inorout!=null ">
+		where i.inorout = #{inorout}
+		</if>
+	</select>	
+	
+
+<select id="instanceHouseAmount" parameterType="java.lang.String" resultType="java.util.HashMap">
+				SELECT
+				w.id,
+				w.wName,
+				ifnull(i.weight, 0) weight
+			FROM
+				t_warehouse w
+			LEFT JOIN t_warehouse_location l ON l.id = w.wLocation
+			LEFT JOIN (
+				SELECT
+					i.location,
+					i.StorageID,
+					sum(w.TotalWeight) - sum(w.CarWeight) weight
+				FROM
+					w_instorage i
+				LEFT JOIN w_weighting w ON i.ID = LEFT (w.id, 14)
+				WHERE
+					i.location = #{location}
+				GROUP BY
+					i.StorageID,
+					i.location
+			) i ON concat(w.id, ',', w.wName) = i.StorageID
+			AND i.location = l.wNo
+			WHERE
+				l.wNo = #{location}
+
+	</select>
+	
+<update id="updateInstorage" parameterType="java.util.HashMap">
+		UPDATE
+		w_instorage SET State='2' WHERE left(ID,14)=left(#{id},14);
+	</update>
+	
+	<update id="updateWeights" parameterType="java.util.HashMap">
+		UPDATE `w_weighting`
+				SET `late` = '0'
+				WHERE
+					id like concat(#{id},"%")
+	</update>
+
+<update id="resetCarStatus" parameterType="java.util.HashMap">
+		update	w_transportcar_basic set Inuse=0 where	left(Inuse,14)=left(#{inuse},14)
+	</update>
+
+<select id="queryPayInstorages" parameterType="java.util.HashMap"	resultType="java.util.HashMap">
+		SELECT
+		i.basicid,
+		i.id,
+		i. OWNER,
+		i.CarID,
+		b. NAME,
+		q. LEVEL,
+		q.Price,
+		IFNULL(w.TotalWeight,0) TotalWeight,
+		IFNULL(w.CarWeight,0) CarWeight,
+		q.AmountPercent,
+		i.State,
+		i.inorout,
+		IFNULL(i.Payway,"") Payway,
+		IFNULL(PayTime,"") paytime,
+        createTime
+
+		FROM
+		w_instorage i
+		LEFT JOIN (
+		SELECT
+		LEFT (w.id, 14)
+		id,
+		SUM(TotalWeight) TotalWeight,
+		SUM(w.CarWeight) CarWeight,
+		count(*)
+		count
+		FROM
+		w_weighting w
+		GROUP BY
+		LEFT (w.id, 14)
+		) w ON i.id = w.id
+		LEFT JOIN w_quality_basic b ON i.Breed = b. CODE
+		LEFT JOIN
+		w_quality q ON i.id = q.id
+		where  i.Payway!=3
+		<if test="id!='' and id!=null ">
+			and	i.id = #{id}
+		</if>
+		<if test="starttime!='' and starttime!=null ">
+			and	DATE_FORMAT(i.CreateTime, '%Y-%c-%d') = DATE_FORMAT(#{starttime},'%Y-%c-%d')
+		</if>
+		<if test="endtime!='' and endtime!=null ">
+			and DATE_FORMAT(i.PayTime,'%Y-%c-%d') = DATE_FORMAT(#{endtime}, '%Y-%c-%d')
+		</if>
+		<if test="owner!='' and owner!=null ">
+			and	i.Owner like	CONCAT('%', #{owner},"%")
+		</if>
+		<if test="state==1">
+			and i.State = 3
+		</if>
+		<if test="state==2">
+			and i.State IN (1,2)
+		</if>
+		<if test="type!=''and type!=null and type!=0">
+		and i.Payway = #{type}
+		</if>
+		<if test="sid!=null">
+			i.storageid=#{sid}
+		</if>
+		order by i.CreateTime desc
+	</select>
+
+<insert id="addPayWay" parameterType="java.util.HashMap">
+	INSERT INTO w_payWay (id,bankName, cardID) VALUES (#{id}, #{bankName},#{carid})
+	</insert>
+
+
+<select id="msgLists" parameterType="java.util.HashMap"	resultType="com.zyiot.entity.qualityChain.BuyMsgFormMap">
+		SELECT
+		id,
+		company,
+		location,
+		houseid,
+		breed,
+		level,
+		name,
+		carid,
+		weights,
+		price,
+		dates
+		FROM
+			t_qualitychain_buymsg where 1=1 
+			
+		<if test="company!='' and company!=null ">
+		 and company=#{company}
+		</if>
+		
+		<if test="breed!='' and breed!=null ">
+		and breed=#{breed}
+		</if>
+			
+	</select>
+	
+	<select id="sellMsgLists" parameterType="java.util.HashMap"	resultType="com.zyiot.entity.qualityChain.SellMsgFormMap">
+	SELECT
+		s.id,
+		s.location,
+		l.wName,
+		s.houseid,
+		s.breed,
+		s.property,
+		s.weights,
+		s.price,
+		s.dates
+	FROM
+		t_qualitychain_sell_Msg s
+	LEFT JOIN t_warehouse_location l ON s.location = l.wNo where 1=1 
+			
+		<if test="location!='' and location!=null ">
+		 and s.location=#{location}
+		</if>
+		
+		<if test="houseid!='' and houseid!=null ">
+		 and s.houseid=#{houseid}
+		</if>
+		
+		<if test="breed!='' and breed!=null ">
+		and s.breed=#{breed}
+		</if>
+			
+	</select> 
+	
+		<select id="storeMsgLists" parameterType="java.util.HashMap"	resultType="com.zyiot.entity.qualityChain.StoreMsgFormMap">
+			SELECT
+				s.id,
+				s.location,
+				l.wName,
+				s.houseid,
+				s.title,
+				s.content,
+				s.stime,
+				s.etime,
+				s.operator
+			FROM
+				t_qualitychain_storemsg s
+			LEFT JOIN t_warehouse_location l ON s.location = l.wNo
+			
+		<if test="stime!='' and stime!=null and etime!='' and etime!=null ">
+		 where s.stime between #{stime} and #{etime}
+		</if>
+	</select> 
+	
+	
+	<select id="instancMsgLists" parameterType="java.util.HashMap"	resultType="java.util.HashMap">
+			SELECT
+				q.id,
+				q.source,
+				q.location,
+				l.wName,
+				q.houseid,
+				q.breed,
+				q.dates,
+				q.amounts,
+				q.property,
+				q.bornDate,
+				q. COMMENT,
+				q.department,
+				w.basicid wid,
+				w.sf,
+				w.CCL,
+				w.Bwsld,
+				w.Gwcm,
+				w.`Level`,
+				w.Zz,
+				w.Rz,
+				w.Hl,
+				w.Zjml,
+				w.Szqw ,
+				w.Zfsz
+			FROM
+				t_qualitychain_instance_quality q
+			LEFT JOIN t_warehouse_location l ON q.location = l.wNo
+			LEFT JOIN w_quality w ON q.qualityid = w.ID
+			where  q.inorout=#{inorout}
+			
+			<if test="location!=null and location!='' ">
+			and q.location=#{location}
+			</if>
+			
+			<if test="houseid!=null and houseid!='' ">
+			and q.houseid=#{houseid}
+			</if>
+			
+			<if test="stime!=null and stime!='' and stime!=null and stime!='' ">
+			and q.dates between #{stime} and #{etime}
+			</if>
+			
+			<if test="id!=null and id!='' ">
+			and q.id=#{id}
+			</if>
+	</select> 
+	
+		<select id="singleInstancMsgLists" parameterType="java.util.HashMap"	resultType="java.util.HashMap">
+			SELECT
+				q.id,
+				q.source,
+				q.location,
+				l.wName,
+				q.houseid,
+				q.breed,
+				q.dates,
+				q.amounts,
+				q.property,
+				q.bornDate,
+				q. COMMENT,
+				q.department,
+				w.basicid wid,
+				w.sf,
+				w.CCL,
+				w.Bwsld,
+				w.Gwcm,
+				w.`Level`,
+				w.Zz,
+				w.Rz,
+				w.Hl,
+				w.Zjml,
+				w.Szqw ,
+				w.Pcpf,
+				w.Smj,
+				w.Zfsz
+			FROM
+				t_qualitychain_instance_quality q
+			LEFT JOIN t_warehouse_location l ON q.location = l.wNo
+			LEFT JOIN w_quality w ON q.qualityid = w.ID
+			where  1=1
+			<if test="id!=null and id!='' ">
+			and  q.id=#{id}
+			</if>
+	</select> 
+	
+	
+	
+		<select id="instancWeight" parameterType="java.util.HashMap"	resultType="java.util.HashMap">
+				SELECT
+				i.location,
+				i.StorageID,
+				sum(w.TotalWeight) - sum(w.CarWeight) weight
+			FROM
+				w_instorage i
+			LEFT JOIN w_weighting w ON i.id = LEFT (w.id, 14)
+			WHERE
+				i.location = #{location}
+			AND i.StorageID = #{houseid}
+			GROUP BY
+				i.location,
+				i.StorageID
+			
+	</select> 
+	
+	<select id="singleInstorage" parameterType="java.util.HashMap"	resultType="java.util.HashMap">
+			SELECT
+			i.basicid ,
+			w.basicid  wid,
+			q.basicid qid,
+			q.Price,
+			i.ID id,
+			i. OWNER,
+			i.Identity,
+			i.phone,
+			i.address,
+			i.breed,
+			i.carid,
+			i.inorout,
+			i.property,
+			i.storageid,
+			i.location,
+			abs(w.TotalWeight) totalweight,
+			abs(w.CarWeight) carweight
+		FROM
+			w_instorage i 
+		left join w_weighting w on w.id=i.id 
+		left join w_quality q  on i.id=q.id
+		where i.basicid=#{id}
+			
+	</select> 
+	
+	
+<select id="instorageTransfer" parameterType="java.util.HashMap"	resultType="java.util.HashMap">
+	SELECT
+		i.basicid param1,
+		l.kuqubianma param3,
+		l.tongyixinyongdaima param4,
+		h.cangfangbianhao storehouse,
+		h.huoweibianhao house,
+		'' allocation,
+		i.id inOutID,
+		CASE i.inorout
+			WHEN '1' THEN
+					'02'
+		ELSE
+					'03'
+		END inOutType,
+		 DATE_FORMAT(i.createTime,'%Y%m%d%H%i%s') date,
+		 i.breed grainKind,
+		 i.property grainAttribute,
+		 q.`Level` grade,
+		 q.Price unitPrice,
+		 sum(w.CarWeight) tareWeight,
+		 sum(w.TotalWeight) grossWeight,
+		 sum(w.TotalWeight) - sum(w.CarWeight) netWeight,
+		(sum(w.TotalWeight) - sum(w.CarWeight)) * q.AmountPercent / 100 deductWeight,
+		cast((sum(w.TotalWeight) - sum(w.CarWeight)) * (100 - q.AmountPercent) / 100 as decimal(9,2)) settleWeight,
+		cast((sum(w.TotalWeight) - sum(w.CarWeight)) * (100 - q.AmountPercent) / 100 * q.price / 100 as decimal(9,2)) settleMoney,
+		'' DBarCode,
+		'[]' items,
+		'' URL,
+		 i. OWNER customerName,
+		 i.identity IDcardNo,
+		 i.carid plateNumber
+		FROM
+			w_instorage AS i
+		INNER JOIN w_quality AS q ON i.id = LEFT (q.id, 14)
+		LEFT JOIN w_weighting AS w ON i.id = LEFT (w.id, 14)
+		left join t_contrast_location l on i.location=l.location_no
+	left join t_contrast_warehouse h on substring_index(i.storageid,',',1)=h.warehose_id  where i.late+w.late!=0
+ group by i.id
+	</select>
+	
+	<select id="storeInstanceTransfer" parameterType="java.util.HashMap"	resultType="java.util.HashMap">
+	SELECT
+	l.kuqubianma param3,
+	l.tongyixinyongdaima param4,
+	h.cangfangbianhao storehouse,
+	h.huoweibianhao house,
+	'' allocation,
+	'1' STATUS,
+	'' houseStoreID,
+	i. NAME grainKind,
+	i.cangKu quantity,
+	i.quanzhong grainAttribute,
+	'' OWNER,
+	i.buyYear YEAR,
+	'' DBarCode,
+	'' houseCode,
+	'' inBeginTime,
+	'' storeBeginTime
+FROM
+	t_storag_info i
+LEFT JOIN t_contrast_location l ON i.source = l.location_no
+LEFT JOIN t_contrast_warehouse h ON i.storageID = h.warehose_id
+	</select>
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.shebeiguanli.DaXingSheBeiMapper">
+<sql id="selectId">
+id,
+leNo,
+leName,
+leStandard,
+leWorth,
+leMotorsNumber,
+lePower,
+leTelephone,
+leZipCode,
+leUsedDate,
+leLocation,
+leManufacturingUnit,
+leManufacturingAddress,
+leSon,
+version,
+leDataOperator,
+leType,
+leUnit,
+leWLNo,
+leAddDate
+</sql>
+<select id="findByPage" resultType="com.zyiot.entity.shebeiguanli.DaXingSheBeiFormMap">
+select 
+tle.id,
+tle.leNo,
+tle.leName,
+tle.leStandard,
+tle.leWorth,
+tle.leManufacturingUnit,
+tle.leUsedDate,
+twl.wName 
+from 
+t_large_equipment as tle,
+t_warehouse_location as twl
+where
+tle.leWLNo = twl.wNo
+<if test="leName !=null and leName !=''">
+and tle.leName like '%${leName}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findDaXingSheBeiById" resultType="com.zyiot.entity.shebeiguanli.DaXingSheBeiFormMap">
+select <include refid="selectId"></include> from t_large_equipment where id=#{0}
+</select>
+<select id="findAllName" resultType="com.zyiot.entity.shebeiguanli.DaXingSheBeiFormMap">
+ select distinct(leName) from t_large_equipment
+</select>
+
+<select id="findHistoryById" resultType="com.zyiot.entity.shebeiguanli.DaXingSheBeiFormMap">
+select <include refid="selectId"></include> from t_large_equipment_his where id=#{0} and lehType='wreck' ORDER BY lehOpDate DESC LIMIT 0,1
+</select>
+
+<select id="findDataDocking" resultType="com.zyiot.entity.shebeiguanli.DaXingSheBeiFormMap">
+select 
+tle.id,
+tle.leName,
+tle.leType,
+tle.leUnit,
+tle.leWorth,
+tle.leStandard,
+tle.leNo,
+tle.leManufacturingUnit,
+tc.text,
+tle.leWLNo
+from 
+t_large_equipment as tle,
+t_codeitem as tc
+where leAddDate>#{0} AND
+tc.codeid = 24 AND
+tle.leType = tc.id
+</select>
+<select id="findRepairHistoryById" resultType="com.zyiot.entity.shebeiguanli.DaXingSheBeiWeiXiuFormMap">
+select id,leid,lerContent,lerRepairDate,lerRepairUser,lerAddDate,version,lerDataOperator from (select id,leid,lerContent,lerRepairDate,lerRepairUser,lerAddDate,version,lerDataOperator from t_large_equipment_repair_his where leId = #{0} and lerhType = 'wreck'  ORDER BY lerhOpDate DESC) as tw GROUP BY id
+</select>
+
+
+</mapper>
+

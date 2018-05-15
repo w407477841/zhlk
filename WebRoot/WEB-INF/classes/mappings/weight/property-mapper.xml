@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.weight.PropertyMapper">
+<select id="findAllProperty" resultType="com.zyiot.entity.weight.PropertyFormMap">
+select * from t_weight_grain_property
+</select>
+<select id="findEnableProperty" resultType="com.zyiot.entity.weight.PropertyFormMap">
+select * from t_weight_grain_property where isEnable = '2' order by id
+</select>
+</mapper>

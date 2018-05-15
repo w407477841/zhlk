@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.WarehouseMapper">
+
+	<select id="findAllWarehouseByLocation" resultType="com.zyiot.entity.WarehouseFormMap">
+		select
+		id,wName from t_warehouse
+	</select>
+	<select id="findWareHouseByLocation" resultType="com.zyiot.entity.WarehouseFormMap">
+		select id,wName from t_warehouse where 1=1
+		<if test="wLocation!=null and wLocation!=''">
+			and wLocation='${wLocation}'
+		</if>
+	</select>
+	<select id="findWareHouseByLocation2" resultType="com.zyiot.entity.WarehouseFormMap">
+		select w.wName wName ,w.id id from t_warehouse w left join
+		t_warehouse_location l on w.wLocation=l.id
+
+		where 1=1
+		<if test="wLocation!=null and wLocation!=''">
+			and l.wNo='${wLocation}'
+		</if>
+	</select>
+	<select id="findWareHouseByLocationAndVariety" resultType="com.zyiot.entity.WarehouseFormMap">
+		select w.wName wName ,w.id id,tsi.`name` from t_warehouse w left join
+		t_warehouse_location l on w.wLocation=l.id
+		LEFT JOIN t_storag_info as
+		tsi ON w.id = tsi.storageID
+		WHERE 1=1
+		<if test="wLocation!=null and wLocation!=''">
+			and l.wNo='${wLocation}'
+		</if>
+		<if test="name!=null and name!=''">
+			and tsi.`name`='${name}'
+		</if>
+	</select>
+
+	<select id="findWarehouseById" resultType="com.zyiot.entity.WarehouseFormMap">
+		select * from
+		t_warehouse where id=#{0}
+	</select>
+	<select id="findWarehouseInfoById" resultType="com.zyiot.entity.WarehouseFormMap">
+		select
+		twi.*,tw.wColumn,tw.wHeight,tw.wRow from
+		(select * from t_warehouse_info where id=#{0}) as
+		twi LEFT JOIN t_warehouse as tw
+		ON twi.wWarehouse = tw.id
+	</select>
+	<select id="findByPage" resultType="com.zyiot.entity.WarehouseFormMap">
+		select tw.*,twl.wName wlName from t_warehouse tw left join
+		t_warehouse_location as twl
+		on tw.wLocation = twl.id
+		where 1=1
+		<if test="wNo != null and wNo != ''">
+			and tw.id = #{wNo}
+		</if>
+		<if test="wLocation != null and wLocation != ''">
+			and wLocation = #{wLocation}
+		</if>
+		<if test="orderby != null and orderby != ''">
+			${orderby}
+		</if>
+	</select>
+	<select id="findWarehouseInfoByPage" resultType="com.zyiot.entity.WarehouseFormMap">
+		select
+		twi.id,twi.wTemperature,twi.gTemperature,twi.wHumidity,twi.gHumidity,twi.cjsj,twi.maxTemperature,twi.minTemperature,tw.wName,twl.wName
+		wlName from t_warehouse_info as twi LEFT JOIN (select id,wLocation,wName from t_warehouse) tw ON
+		twi.wWarehouse = tw.id LEFT JOIN (select id,wName from t_warehouse_location) as twl ON
+		tw.wLocation = twl.id
+		where 1=1
+		<if test="wWarehouse != null and wWarehouse != ''">
+			and twi.wWarehouse = #{wWarehouse}
+		</if>
+		<if test="wLocation != null and wLocation != ''">
+			and tw.wLocation = #{wLocation}
+		</if>
+		<if test="orderby != null and orderby != ''">
+			${orderby}
+		</if>
+	</select>
+</mapper>

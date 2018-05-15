@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.ChuanGanQiBaoJingMapper">
+<select id="getDatas" resultType="com.zyiot.entity.ChuanGanQiBaoJingFormMap">
+	select common , DATE_FORMAT(cjsj,'%Y-%c-%d %H:%i:%s') cjsj from
+	t_chuanganqi_baojing where cjsj=(select max(cjsj) from
+	t_chuanganqi_baojing) ORDER BY common
+</select>
+</mapper>

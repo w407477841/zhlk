@@ -1,0 +1,107 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<title>${prop.appName}</title>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<!-- name="viewport" 的详细用法  http://www.php100.com/html/webkaifa/HTML5/2012/0831/10979.html -->
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<script>
+	document
+			.write("<link id='bs-css'  href='${ctx}/css/bootstrap-cerulean.min.css?version="
+					+ new Date().getTime() + "' rel='stylesheet' />");
+	document.write("<link  href='${ctx}/css/charisma-app.css?version="
+			+ new Date().getTime() + "' rel='stylesheet' />");
+	document
+			.write("<link  href='${ctx}/bower_components/fullcalendar/dist/fullcalendar.css?version="
+					+ new Date().getTime() + "' rel='stylesheet' />");
+</script>
+
+<!-- 图标配置，使用font-awesome,也可以使用bootstrap图标 -->
+<link rel="stylesheet"
+	href="${ctx}/js/font-awesome/css/font-awesome.min.css">
+<link
+	href='${ctx}/bower_components/fullcalendar/dist/fullcalendar.print.css'
+	rel='stylesheet' media='print'>
+<link href='${ctx}/bower_components/chosen/chosen.min.css'
+	rel='stylesheet'>
+<link href='${ctx}/bower_components/colorbox/example3/colorbox.css'
+	rel='stylesheet'>
+<link href='${ctx}/css/jquery.noty.css' rel='stylesheet'>
+<link href='${ctx}/css/noty_theme_default.css' rel='stylesheet'>
+<link href='${ctx}/css/elfinder.min.css' rel='stylesheet'>
+<link href='${ctx}/css/elfinder.theme.css' rel='stylesheet'>
+<link href='${ctx}/css/jquery.iphone.toggle.css' rel='stylesheet'>
+<link href='${ctx}/css/uploadify.css' rel='stylesheet'>
+<link href='${ctx}/css/labelStyle.css' rel='stylesheet'>
+<link href='${ctx}/css/animate.min.css' rel='stylesheet'>
+<link rel="stylesheet" type="text/css"
+	href="${ctx}/jquery-easyui-1.5/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="${ctx}/jquery-easyui-1.5/themes/icon.css">
+<link rel="stylesheet" type="text/css"
+	href="${ctx}/css/commonChanges.css">
+
+<script type="text/javascript">
+	var rootPath = "${ctx}";
+</script>
+<!-- jQuery -->
+<script type="text/javascript"
+	src="${pageContext.servletContext.contextPath}/js/echarts.js">
+</script>
+<script src="${ctx}/js/jquery-1.7.1.min.js"></script>
+<link rel="shortcut icon" href="${ctx}/img/ico.png">
+<!-- external javascript -->
+<script src="${ctx}/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<!-- library for cookie management -->
+<script src="${ctx}/js/jquery.cookie.js"></script>
+<!-- calender plugin -->
+<script src='${ctx}/bower_components/moment/min/moment.min.js'></script>
+<script
+	src='${ctx}/bower_components/fullcalendar/dist/fullcalendar.min.js'></script>
+
+<!-- select or dropdown enhancer -->
+<script src="${ctx}/bower_components/chosen/chosen.jquery.js"></script>
+<!-- plugin for gallery image view -->
+<script src="${ctx}/bower_components/colorbox/jquery.colorbox-min.js"></script>
+<!-- notification plugin -->
+<script src="${ctx}/js/jquery.noty.js"></script>
+<!-- for iOS style toggle switch -->
+<script src="${ctx}/js/jquery.iphone.toggle.js"></script>
+
+<!-- multiple file upload plugin -->
+<script src="${ctx}/js/jquery.uploadify-3.1.min.js"></script>
+<!-- history.js for cross-browser state change on ajax -->
+<script src="${ctx}/js/jquery.history.js"></script>
+<!-- application script for Charisma demo -->
+<script src="${ctx}/js/charisma.js"></script>
+<script type="text/javascript"
+	src="${ctx}/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="${ctx}/jquery-easyui-1.5/plugins/jquery.validatebox.js"></script>
+<script type="text/javascript"
+	src="${ctx}/jquery-easyui-1.5/locale/easyui-lang-zh_CN.js"></script>
+
+<script type="text/javascript" src="${ctx}/common/common.js"></script>
+<script src="${ctx}/js/jquery.form.js"></script>
+<script type="text/javascript" src="${ctx}/js/jquery.validate.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/json.js">
+</script>
+
+<script type="text/javascript" src="${ctx}/js/EventUtil.js"></script>
+<script type="text/javascript" src="${ctx}/js/commonUtil.js"></script>
+<script type="text/javascript" src="${ctx}/js/varibles.js"></script>
+
+<script type="text/javascript" src="${ctx}/js/assets/laydate/laydate.js"></script>
+<script type="text/javascript"
+	src="${ctx}/js/layer-v1.9.2/layer/layer.js"></script>
+<script type="text/javascript" src="${ctx}/common/common_select.js"></script>
+

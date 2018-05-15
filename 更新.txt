@@ -1,0 +1,51 @@
+2017-01-09 
+添加数据库表 t_chuanganqi_data  	
+
+2017-01-12
+添加数据表t_large_equipment、t_large_equipment_his、t_large_equipment_appendix
+t_large_equipment_repair、t_large_equipment_repair_his
+
+添加数据库表 t_chuanganqi_data  
+=============
+t_resources 数据修改
+update t_resources set icon='glyphicon glyphicon-cog' where name='系统基础管理' and parentId=0
+update t_resources set icon='glyphicon glyphicon-comment' where name='登陆信息管理' and parentId=0
+update t_resources set icon='glyphicon glyphicon-list-alt' where name='操作日志管理' and parentId=0
+update t_resources set icon='glyphicon glyphicon-home' where name='县级粮库管理' and parentId=0
+update t_resources set icon='glyphicon glyphicon-book' where name='业务管理系统' and parentId=0
+update t_resources set icon='glyphicon glyphicon-globe' where name='仓储智能化系统' and parentId=0
+update t_resources set icon='glyphicon glyphicon-facetime-video' where name='智能安防系统' and parentId=0
+update t_resources set icon='glyphicon glyphicon-pencil' where name='出入库明细' and parentId=0
+update t_resources set icon='glyphicon glyphicon-download-alt' where name='收储称重系统' and parentId=0
+================
+INSERT INTO `zhlk`.`t_resources` (`name`, `parentId`, `resKey`, `type`, `resUrl`, `level`, `icon`, `ishide`, `description`) VALUES ( '出入库登记', '260', '/register/listUI.shtml', NULL, '/storage/register/listUI.shtml', NULL, NULL, '0', NULL);
+INSERT INTO `zhlk`.`t_resources` (`name`, `parentId`, `resKey`, `type`, `resUrl`, `level`, `icon`, `ishide`, `description`) VALUES ('称重', '260', '/weighting/listUI.shtml', NULL, '/storage/weighting/listUI.shtml', NULL, NULL, '0', NULL);
+INSERT INTO `zhlk`.`t_resources` (`name`, `parentId`, `resKey`, `type`, `resUrl`, `level`, `icon`, `ishide`, `description`) VALUES ('财务结算', '260', '/fiancePayment/listUI.shtml', NULL, '/storage/fiancePayment/listUI.shtml', NULL, NULL, '0', NULL);
+INSERT INTO `zhlk`.`t_resources` (`name`, `parentId`, `resKey`, `type`, `resUrl`, `level`, `icon`, `ishide`, `description`) VALUES ('报表展示', '260', '/reports/listUI.shtml', NULL, '/storage/reports/listUI.shtml', NULL, NULL, '0', NULL);
+INSERT INTO `zhlk`.`t_resources` (`name`, `parentId`, `resKey`, `type`, `resUrl`, `level`, `icon`, `ishide`, `description`) VALUES ('参数配置', '260', '/paramConfig/listUI.shtml', NULL, '/storage/paramConfig/listUI.shtml', NULL, NULL, '0', NULL);
+11111111111111111111111
+20170117
+添加表 t_chuanganqi_baojing
+
+20170206
+添加 t_qualitative
+
+20170210-lip
+添加t_warehouse_repair，t_warehouse_repair_his，t_warehouse_transfer，t_warehouse_transfer_his
+t_warehouse_grain_transfer，t_warehouse_storage_capacity，t_warehouse_storage_capacity_his
+
+2017-02-16-lip
+添加t_putin_storage_plan,t_putin_storage_plan_his,t_getout_storage_plan,t_getout_storage_plan_his,
+t_putin_storage_loss,t_putin_storage_loss_his,t_getout_storage_loss,t_getout_storage_loss_his
+
+2017-02-21-lip
+添加t_getout_storage_apply,t_getout_storage_apply_transfer_tools,t_getout_storage_apply_his,t_getout_storage_auditing
+
+修改t_warehouse_info,添加maxTemperature(float)-最高温度,minTemperature(float)-最低温度，两个字段
+
+2017-02-28-lip
+添加t_info_type,t_info_release,t_info_release_his,t_appointment_grain,t_appointment_grain_his,
+t_policy_query,t_policy_query_his
+
+2017-03-02
+添加t_credit_note,t_credit_note_his

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.FoodStorageMapper">
+<select id="findProjects" parameterType="java.util.HashMap" resultType="com.zyiot.entity.FoodStorageProjectFormMap">
+	SELECT tswp.id,type,houseid,breed,status,ctime,reason,tswp.version,tw.wName,twl.wName as wlName,twgv.text FROM t_storage_work_project as tswp LEFT JOIN
+    t_warehouse as tw ON tswp.houseid = tw.id LEFT JOIN t_weight_grain_variety as twgv
+    ON tswp.breed = twgv.id LEFT JOIN t_warehouse_location as twl 
+    on tswp.location = twl.id
+    where 1=1
+	<if test="type!='' and type!=null ">
+	and tswp.type=#{type}
+	</if>
+	<if test="status !='' and status !=null ">
+	and tswp.status=#{status}
+	</if>
+	<if test="orderby !='' and orderby !=null ">
+	${orderby}
+	</if>
+</select>
+
+<select id="findPLan" parameterType="java.util.HashMap" resultType="com.zyiot.entity.FoodStoragePlanFormMap">
+SELECT id,times,timee,ctime,title,projectid FROM t_storage_work_plan where 1=1 
+		<if test="title!='' and title!=null ">
+	and title like concat("%",#{title},"%")
+	</if>
+	<if test="orderby !='' and orderby !=null ">
+	${orderby}
+	</if>
+</select>
+
+<select id="findWind" parameterType="java.util.HashMap" resultType="com.zyiot.entity.FoodStorageWindFormMap">
+select tsrw.*,tw.wName,twl.wName wlName,twgv.text from t_storage_record_wind as tsrw LEFT JOIN t_warehouse as tw
+ON tsrw.houseid = tw.id LEFT JOIN t_warehouse_location as twl
+ON tsrw.location = twl.id LEFT JOIN t_weight_grain_variety as twgv
+ON tsrw.breed = twgv.id
+ where 1=1
+<if test="wlNo != null and wlNo != ''">
+	and  twl.id = #{wlNo}
+</if>
+<if test="wNo != null and wNo != ''">
+	and  tw.id = #{wNo}
+</if>
+</select>
+
+<select id="findSteam" parameterType="java.util.HashMap" resultType="com.zyiot.entity.FoodStorageSteamFormMap">
+select tsrs.*,tw.wName,twl.wName wlName,twgv.text from t_storage_record_steam as tsrs LEFT JOIN
+t_warehouse as tw ON tsrs.houseid = tw.id LEFT JOIN
+t_warehouse_location as twl ON tsrs.location = twl.id LEFT JOIN
+t_weight_grain_variety as twgv ON tsrs.breed = twgv.id where 1=1
+<if test="breed!='' and breed!=null ">
+	and breed=#{breed}
+	</if>
+	<if test="wlNo != null and wlNo != ''">
+	and  twl.id = #{wlNo}
+</if>
+<if test="wNo != null and wNo != ''">
+	and  tw.id = #{wNo}
+</if>
+	<if test="type!='' and type!=null ">
+	and type=#{type}
+	</if>
+	<if test="orderby!='' and orderby!=null ">
+	${orderby}
+	</if>
+</select>
+
+<select id="findCold" parameterType="java.util.HashMap" resultType="com.zyiot.entity.FoodStorageColdFormMap">
+select tsrc.*,twl.wName wlName,tw.wName,twgv.text from t_storage_record_cold as tsrc LEFT JOIN t_warehouse_location as twl
+ON tsrc.location = twl.id LEFT JOIN t_warehouse as tw 
+ON tsrc.houseid = tw.id LEFT JOIN t_weight_grain_variety as twgv
+ON tsrc.breed = twgv.id where 1=1
+<if test="times!='' and times!=null and timee!='' and timee!=null">
+and timecreate between #{times} and #{timee}
+</if>
+<if test="wlNo != null and wlNo != ''">
+	and  twl.id = #{wlNo}
+</if>
+<if test="wNo != null and wNo != ''">
+	and  tw.id = #{wNo}
+</if>
+<if test="orderby != null and orderby != ''">
+${orderby}
+</if>
+</select>
+
+<select id="findAirCold" parameterType="java.util.HashMap" resultType="com.zyiot.entity.FoodStorageAirColdFormMap">
+select tsrc.*,twl.wName wlName,tw.wName,twgv.text from t_storage_record_aircold as tsrc LEFT JOIN t_warehouse_location as twl
+ON tsrc.location = twl.id LEFT JOIN t_warehouse as tw 
+ON tsrc.houseid = tw.id LEFT JOIN t_weight_grain_variety as twgv
+ON tsrc.breed = twgv.id where 1=1
+	<if test="breed!='' and breed!=null ">
+	and breed=#{breed}
+	</if>
+	<if test="wlNo != null and wlNo != ''">
+	and  twl.id = #{wlNo}
+</if>
+<if test="wNo != null and wNo != ''">
+	and  tw.id = #{wNo}
+</if>
+	<if test="orderby != null and orderby != ''">
+${orderby}
+</if>
+</select>
+
+<select id="findSteamPlan" parameterType="java.util.HashMap" resultType="com.zyiot.entity.FoodStorageSteamPlanFormMap">
+select * from t_storage_steam_present where 1=1
+	<if test="mName!='' and mName!=null ">
+	and mName=#{mName}
+	</if>
+</select>
+
+<select id="findSingleProject" resultType="com.zyiot.entity.FoodStorageProjectFormMap">
+select tswp.*,tw.wName,twl.wName wlName,twgv.text from (
+select * from t_storage_work_project where id=#{0}
+) as tswp LEFT JOIN t_warehouse as tw
+ON tswp.houseid = tw.id LEFT JOIN t_warehouse_location as twl
+ON tswp.location = twl.id LEFT JOIN t_weight_grain_variety as twgv
+ON tswp.breed = twgv.id
+</select>
+<select id="findSingleWind" resultType="com.zyiot.entity.FoodStorageWindFormMap">
+select tsrw.*,twgv.text from (select * from t_storage_record_wind where id =#{0}) as tsrw LEFT JOIN
+t_weight_grain_variety as twgv ON tsrw.breed = twgv.id
+</select>
+<select id="findSingleSteam" resultType="com.zyiot.entity.FoodStorageSteamFormMap">
+select tsrw.*,twgv.text from (select * from t_storage_record_steam where id =#{0}) as tsrw LEFT JOIN
+t_weight_grain_variety as twgv ON tsrw.breed = twgv.id
+</select>
+<select id="findSingleCold" resultType="com.zyiot.entity.FoodStorageColdFormMap">
+select tsrw.*,twgv.text from (select * from t_storage_record_cold where id =#{0}) as tsrw LEFT JOIN
+t_weight_grain_variety as twgv ON tsrw.breed = twgv.id
+</select>
+<select id="findSingleAirCold" resultType="com.zyiot.entity.FoodStorageAirColdFormMap">
+select tsrw.*,twgv.text from (select * from t_storage_record_aircold where id =#{0}) as tsrw LEFT JOIN
+t_weight_grain_variety as twgv ON tsrw.breed = twgv.id
+</select>
+
+<select id="getDetail" resultType="com.zyiot.entity.FoodStorageProjectFormMap">
+select twa.wId,waAeration,waFumigate,waInnerLong,waInnerWidth,waDesignHeight,sf from 
+(select * from t_warehouse_archives where wId=#{0}) AS twa
+LEFT JOIN (
+select wId,sf from (select * from t_quality_manager where wId = #{0}) as tqm where 
+tqm.checkDate>IFNULL((select emptyDate from t_storage_empty_info where wId=#{0} ORDER BY emptyDate DESC LIMIT 0,1),"2010-01-01 00:00:00")
+ORDER BY tqm.checkDate DESC LIMIT 0,1
+) as tc
+ON twa.wId = tc.wId
+</select>
+<select id="getMaxBId" resultType="java.lang.String">
+select MAX(bill) from t_storage_steam_present where left(bill,8) = #{0}
+</select>
+<select id="findPrintById" resultType="com.zyiot.util.FormMap">
+select tw.wName,
+tswp.length,tswp.width,tswp.acturalHeight,tswp.waterPer,tswp.times,tswp.ctime,
+tswp.amount,tswp.houseTemperature,tswp.footTemperature,tswp.upperTemperature,
+tswp.innerWet,tswp.chonghai,tswp.perWeight,tswp.steamForm,
+twa.waWarehouseType,twa.waInnerWidth,twa.waInnerLong,twa.waDesignHeight,
+twgv.text grainVariety,
+
+tssp.peopleMsg,tssp.mAmount,tssp.remark
+
+from (select * from t_storage_work_project where id = #{0}) as tswp 
+LEFT JOIN t_storage_steam_present as tssp ON tswp.bId = tssp.bill
+LEFT JOIN t_warehouse as tw ON tswp.houseid = tw.id
+LEFT JOIN t_weight_grain_variety as twgv ON tswp.breed = twgv.id
+LEFT JOIN t_warehouse_archives as twa ON tswp.houseid = twa.wId
+
+</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.shibiedaima.EnterpriseMapper">
+<sql id="selectId">
+id,
+eName,
+eGroupCode,
+eAddrCode,
+eLocation,
+ePerson,
+eNature,
+ePhone,
+eClassify,
+eCredit
+</sql>
+<select id="findByPage" resultType="com.zyiot.entity.shibiedaima.EnterpriseFormMap">
+select <include refid="selectId"></include> from t_enterprise where 1=1
+<if test="eName !=null and eName !=''">
+and eName like '%${eName}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findInFormByPage" resultType="com.zyiot.entity.shibiedaima.InRegisterFormMap">
+		SELECT
+			r.id,
+			r.`code`,
+			r.codeName,
+			r.bornDate,
+			r.storageWay,
+			c.text breed ,
+			c1.text property,
+			r.amounts,
+			r.institution,
+			r.`level`,
+			r.bornPlace,
+			r.bornYear,
+			r.inDate
+		FROM
+			t_instorage_register r
+		LEFT JOIN t_weight_grain_variety c ON r.breed = c.id
+		LEFT JOIN t_weight_grain_property c1 ON r.property = c1.id
+		where 1=1
+		<if test="codeName != null and codeName != ''">
+		r.codeName = #{codeName}
+		</if>
+</select>
+
+<select id="findOutFormByPage" resultType="com.zyiot.entity.shibiedaima.OutRegisterFormMap">
+		SELECT
+			r.id,
+			r.`code`,
+			l.wName location,
+			w.wName houseid,
+			r.roomName,
+			r.positionName,
+			r.outDate,
+			r.amounts
+		FROM
+			t_outstorage_register r
+		LEFT JOIN t_warehouse_location l ON r.location = l.wNo
+		LEFT JOIN t_warehouse w ON r.houseid = w.id
+where  1=1
+<if test="wName != null and wName != ''">
+l.wName =#{wName}
+		</if>
+</select>
+
+<select id="findOneInForm" resultType="com.zyiot.entity.shibiedaima.InRegisterFormMap" parameterType="java.lang.String">
+		
+		SELECT
+			r.id,
+			r.`code`,
+			r.codeName,
+			r.bornDate,
+			CASE r.storageWay
+		WHEN 1 THEN
+			'代储'
+		ELSE
+			'直储'
+		END storageWay,
+		 c.text breed,
+		 c1.text property,
+		 r.amounts,
+		 r.institution,
+		 r.`level`,
+		 r.bornPlace,
+		 r.bornYear,
+		 r.inDate
+		FROM
+			t_instorage_register r
+		LEFT JOIN t_codeitem c ON r.breed = c.id
+		AND c.codeid = 12
+		LEFT JOIN t_codeitem c1 ON r.property = c1.id
+		AND c1.codeid = 11 where r.id=#{id}
+</select>
+
+
+</mapper>
+

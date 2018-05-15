@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.WindowConfigMapper">
+	<sql id="selectId">
+		id,warehouse,location,cangkudianwei,sort,direction,open1,open2,close1,close2,needClosedBeforeOpen,needOpenBeforeClose,duration,ip,port,name
+	</sql>
+	<select id="findWindowConfigByPage" resultType="com.zyiot.entity.WindowConfigFormMap">
+		select twc.*,tc.location_id from  (
+		select * from t_window_config
+		where 1=1
+		<if test="id != null and id!=''"> 
+		and id=${id}
+		</if>
+		<if test="name != null and name!=''"> 
+		and name like '%${name}%'
+		</if>
+		<if test="cangkudianwei != null and cangkudianwei!=''"> 
+		and cangkudianwei='${cangkudianwei}'
+		</if>
+		) as twc LEFT JOIN t_cangkudianwei as tc
+        ON twc.cangkudianwei = tc.id 
+	</select>
+	<select id="findCangKuDianWei" resultType="com.zyiot.entity.WindowConfigFormMap">
+		select * from t_cangkudianwei where id in(
+		SELECT cangkudianwei FROM
+		`t_window_config`)
+		<if test="location_id != null and location_id != ''">
+			and location_id = #{location_id}
+		</if>
+	</select>
+
+	<select id="findShipin" resultType="com.zyiot.entity.WindowConfigFormMap">
+
+		select * from t_shipindianwei
+		where id = (select shipin2 from
+		t_cangkudianwei where
+		id='${cangkudianwei}') or id = (select shipin1
+		from t_cangkudianwei
+		where id='${cangkudianwei}')
+	</select>
+
+
+</mapper>

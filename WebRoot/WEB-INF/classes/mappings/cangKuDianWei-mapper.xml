@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.CangKuDianWeiMapper">
+	<select id="findDianWeiByPage" resultType="com.zyiot.entity.CangKuDianWeiFormMap">
+		SELECT tc.id,tc.`name`,tc.cLeft,tc.cTop,tc.lx,twl.wName from
+		t_cangkudianwei as tc LEFT JOIN t_warehouse_location as twl
+		ON
+		tc.location_id = twl.id
+		where 1=1
+		<if test="location_id!=null and location_id !=''">
+			and twl.id ='${location_id}'
+		</if>
+		<if test="name!=null and name !=''">
+			and name like '%${name}%'
+		</if>
+	</select>
+	<select id="findDataById" resultType="com.zyiot.entity.CangKuDianWeiFormMap">
+
+		select cgq.lx,cgqd.datas data from (select id,lx,`name` from t_chuanganqi where
+		cangkudianwei_id = #{0}) AS cgq LEFT JOIN
+		(
+		select * from (
+		select * from t_chuanganqi_data where chuanganqi_id in(select id from
+		t_chuanganqi where cangkudianwei_id = #{0}) ORDER BY cjsj DESC)
+		as tcqd GROUP BY chuanganqi_id
+		)as cgqd ON cgq.id = cgqd.chuanganqi_id order by cgq.id asc
+	</select>
+
+
+</mapper>
+

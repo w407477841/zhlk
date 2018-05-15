@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cunchuguanli.RuKuFangAnMapper">
+
+<select id="findByPage" resultType="com.zyiot.entity.cunchuguanli.RuKuFangAnFormMap">
+select tpsp.*,
+tw.wName,
+twl.wName wlName,
+tc.text variety,
+tc1.text category
+from 
+t_putin_storage_plan as tpsp LEFT JOIN
+t_warehouse as tw ON tpsp.pspWId=tw.id LEFT JOIN
+t_warehouse_location as twl ON tw.wLocation=twl.id LEFT JOIN
+t_weight_grain_variety as tc ON tpsp.pspVariety = tc.id LEFT JOIN
+t_weight_grain_property as tc1 ON tpsp.pspCategory=tc1.id
+where 1=1 
+
+<if test="wlNo !=null and wlNo !=''">
+and twl.id = #{wlNo}
+</if>
+<if test="wNo !=null and wNo !=''">
+and tw.id = #{wNo}
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+<select id="findRuKuFangAnById" resultType="com.zyiot.entity.cunchuguanli.RuKuFangAnFormMap">
+select tpsp.*,
+tw.wName,
+twl.wName wlName,
+tc.text variety,
+tc1.text category
+from 
+(select * from t_putin_storage_plan where id=#{0}) as tpsp LEFT JOIN
+t_warehouse as tw ON tpsp.pspWId=tw.id LEFT JOIN
+t_warehouse_location as twl ON tw.wLocation=twl.id LEFT JOIN
+t_weight_grain_variety as tc ON tpsp.pspVariety = tc.id LEFT JOIN
+t_weight_grain_property as tc1 ON tpsp.pspCategory=tc1.id
+</select>
+<select id="lookRuKuFangAnById" resultType="com.zyiot.entity.cunchuguanli.RuKuFangAnFormMap">
+select tpsp.*,
+tw.wName,
+twl.wName wlName,
+tc.text variety,
+tc1.text category
+from 
+(select * from t_putin_storage_plan where id=#{0}) as tpsp LEFT JOIN
+t_warehouse as tw ON tpsp.pspWId=tw.id LEFT JOIN
+t_warehouse_location as twl ON tw.wLocation=twl.id LEFT JOIN
+t_weight_grain_variety as tc ON tpsp.pspVariety = tc.id LEFT JOIN
+t_weight_grain_property as tc1 ON tpsp.pspCategory=tc1.id
+</select>
+
+</mapper>
+

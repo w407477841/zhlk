@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.shebeiguanli.DaXingSheBeiWeiXiuMapper">
+<sql id="selectId">
+ler.id id,
+leId,
+lerContent,
+lerRepairDate,
+lerRepairUser,
+lerAddDate,
+ler.version version,
+lerDataOperator,
+leNo,
+leName,
+wl.wName
+</sql>
+<select id="findByPage" resultType="com.zyiot.entity.shebeiguanli.DaXingSheBeiWeiXiuFormMap">
+select <include refid="selectId"></include> from 
+t_large_equipment le,
+t_large_equipment_repair ler,
+t_warehouse_location wl
+where le.id = ler.leId AND
+le.leWLNo = wl.wNo
+<if test="leName !=null and leName !=''">
+and leName like '%${leName}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findDaXingSheBeiWeiXiuById" resultType="com.zyiot.entity.shebeiguanli.DaXingSheBeiWeiXiuFormMap">
+select <include refid="selectId"></include> from 
+t_large_equipment le,
+t_large_equipment_repair ler,
+t_warehouse_location wl
+where le.id = ler.leId AND
+le.leWLNo = wl.wNo AND
+ler.id=#{0}
+</select>
+<select id="findByLeId" resultType="com.zyiot.entity.shebeiguanli.DaXingSheBeiWeiXiuFormMap">
+select * from t_large_equipment_repair where leId=#{0}
+</select>
+</mapper>
+

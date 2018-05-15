@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.weight.HardwareConfigMapper">
+<select id="findByMacAndType" resultType="com.zyiot.entity.weight.HardwareConfigFormMap">
+select * from t_weight_hardware_config where mac=#{0} and carType=#{1} order by id desc
+</select>
+<select id="findByCarType" resultType="com.zyiot.entity.weight.HardwareConfigFormMap">
+select * from t_weight_hardware_config where carType=#{0} order by id desc
+</select>
+</mapper>

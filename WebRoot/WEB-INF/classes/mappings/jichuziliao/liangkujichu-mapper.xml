@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.jichuziliao.LiangKuJiChuMapper">
+<select id="findByPage" resultType="com.zyiot.entity.jichuziliao.LiangKuJiChuFormMap">
+select twla.*,twl.wName from t_warehouse_location_archives as twla LEFT JOIN
+t_warehouse_location as twl ON twla.wlaNo = twl.id
+where 1=1
+<if test="wlNo !=null and wlNo !=''">
+and twl.id = #{wlNo}
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findLiangKuJiChuById" resultType="com.zyiot.entity.jichuziliao.LiangKuJiChuFormMap">
+select twla.*,twl.wName from (select * from t_warehouse_location_archives where id = #{0}) as twla LEFT JOIN
+t_warehouse_location as twl ON twla.wlaNo = twl.id
+</select>
+</mapper>
+

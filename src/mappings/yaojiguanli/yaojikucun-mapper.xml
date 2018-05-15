@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.yaojiguanli.YaoJiKuCunMapper">
+<sql id="selectId">
+id,
+mrDrug,
+mrName,
+mrBrand,
+mrPage,
+mrStandard,
+mrPrice,
+mrNumber,
+mrUnit,
+mrManufactureDate,
+mrProductCompany,
+mrOperator,
+mrAuditor,
+mrRemark,
+version,
+mrDataOperator,
+mrWLNo,
+addDate
+</sql>
+<select id="findByPage" resultType="com.zyiot.entity.yaojiguanli.YaoJiKuCunFormMap">
+select 
+tmr.id,
+tmr.mrName,
+tmr.mrBrand,
+tmr.mrStandard,
+tmr.mrNumber,
+tmr.mrManufactureDate,
+tmr.mrProductCompany,
+tc.text ,
+wl.wName
+from 
+t_medicament_repository as tmr,
+t_codeitem tc ,
+t_warehouse_location wl
+where tc.codeid=22 AND
+tmr.mrPage = tc.id AND
+tmr.mrWLNo = wl.wNo
+<if test="mrName !=null and mrName !=''">
+and tmr.mrName like '%${mrName}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findYaoJiKuCunById" resultType="com.zyiot.entity.yaojiguanli.YaoJiKuCunFormMap">
+select <include refid="selectId"></include> from t_medicament_repository where id=#{0}
+</select>
+<select id="lookYaoJiKuCunById" resultType="com.zyiot.entity.yaojiguanli.YaoJiKuCunFormMap">
+select tmr.*,
+tc1.text drug,
+tc2.text page,
+wl.wName
+ from 
+t_medicament_repository as tmr,
+t_codeitem as tc1,
+t_codeitem as tc2,
+t_warehouse_location as wl
+where tc1.codeid = 16 AND
+tmr.mrDrug = tc1.id AND
+tc2.codeid = 22 AND
+tmr.mrPage = tc2.id AND
+tmr.mrWLNo = wl.wNo AND
+tmr.id=#{0}
+</select>
+<select id="findAll" resultType="com.zyiot.entity.yaojiguanli.YaoJiKuCunFormMap">
+select id,mrName from t_medicament_repository
+</select>
+<select id="findDataDocking" resultType="com.zyiot.entity.yaojiguanli.YaoJiKuCunFormMap">
+select 
+tmr.id,
+tmr.mrStandard,
+tmr.mrNumber,
+tc.text,
+tmr.mrDrug,
+tmr.mrWLNo
+from 
+t_medicament_repository as tmr,
+t_codeitem as tc
+where addDate>#{0} AND
+tc.codeid = 22 AND
+tmr.mrPage = tc.id
+</select>
+</mapper>
+

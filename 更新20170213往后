@@ -1,0 +1,61 @@
+20170214
+添加表 t_warehouse_save_report_list
+
+执行以下sql
+INSERT INTO `zhlk`.`t_resources` ( `name`, `parentId`, `resKey`, `type`, `resUrl`, `level`, `icon`, `ishide`, `description`) VALUES ( '上报管理', '0', 'report', NULL, 'report', NULL, 'glyphicon glyphicon-tags', '0', NULL);
+INSERT INTO `zhlk`.`t_resources` ( `name`, `parentId`, `resKey`, `type`, `resUrl`, `level`, `icon`, `ishide`, `description`) VALUES ('粮食储藏上报', '267', 'warehouseSaveReport_addUI', NULL, '/warehouseSaveReport/addUI.shtml', '1', NULL, '0', NULL);
+
+
+20170216
+添加表　t_timestamp
+w_instorage添加字段 update_time  timestamp default CURRENT_TIMESTAMP
+20170217
+w_quality 添加字段location varchar(30)  , update_time  timestamp default CURRENT_TIMESTAMP
+w_weighting 添加字段location varchar(30)  , update_time  timestamp default CURRENT_TIMESTAMP
+删除 存储管理-出入库补录下的子目录
+删除 存储管理-出入库记录下的子目录
+修改 存储管理-出入库记录 /storage/register/listUI.shtml
+修改 存储管理-出入库补录 /storage/paramConfig/listUI.shtml?disable=true
+
+更新 收储称重系统子目录顺序
+	UPDATE `t_resources` SET `level`='1' WHERE (`name`='出入库登记')
+	UPDATE `t_resources` SET `level`='2' WHERE (`name`='称重')
+	UPDATE `t_resources` SET `level`='3' WHERE (`name`='财务结算')
+	UPDATE `t_resources` SET `level`='4' WHERE (`name`='报表展示')
+	UPDATE `t_resources` SET `level`='5' WHERE (`name`='参数配置')
+
+	
+	
+20170223
+t_store_info 添加字段 sdYear varchar(10)  , sdPutin timestamp	
+
+20170228
+INSERT INTO `zhlk`.`t_resources` (`name`, `parentId`, `resKey`, `type`, `resUrl`, `level`, `icon`, `ishide`, `description`) VALUES ( '虫情检测', '86', 'chongqingjiance_list', NULL, '/chongqingjiance/list.shtml', '1', NULL, '0', NULL);
+
+20170303
+	
+添加表
+	t_qualitychain_buymsg,
+	t_qualitychain_instance_quality,
+	t_qualitychain_sell_msg,
+	t_qualitychain_storemsg
+	t_enterprise ,t_contrast_location,t_contrast_warehouse
+删除 业务管理-粮食库内质量安全追溯系统-出库质量信息
+
+修改  业务管理-粮食库内质量安全追溯系统-出入库质量信息	
+
+数据变动 	
+t_warehouse_location,t_warehouse
+
+20170308
+	修改t_chuanganqi 数据    lx = co2 o2 h3p h3pW
+
+20170314
+
+	添加表t_outstorage_register,t_instorage_register
+	
+	修改表t_storage_detail 增加字段 sdPrice
+	
+	添加定时任务call_sp_autoupdate_storageInfo
+	
+	添加存储过程sp_autoupdate_storageInfo

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.mobile.MobileResourceMapper">
+	<select id="findResourceById" resultType="com.zyiot.entity.mobile.MobileResourceFormMap" >
+	  select * from app_permission where id = #{0}
+	</select>
+	<delete id="dropResourceAndPrmession">
+	delete from app_role_permission where resId in
+	  <foreach collection="list" open="(" close=")" index="index" separator="," item="item">
+	    #{item}
+	  </foreach>
+	</delete>
+	<delete id="dropResource">
+	  delete from app_permission where id in
+	  <foreach collection="list" open="(" close=")" index="index" separator="," item="item">
+	   #{item}
+	  </foreach>
+	</delete>
+	<select id="findByPermission"  resultType="com.zyiot.entity.mobile.MobileResourceFormMap">
+	select * from app_permission where id in(select resId from app_role_permission where roleId =#{roleId})
+	</select>
+	<select id="findAllResource" resultType="com.zyiot.entity.mobile.MobileResourceFormMap">
+	select * from app_permission ORDER BY `level` ASC
+	</select>
+</mapper>

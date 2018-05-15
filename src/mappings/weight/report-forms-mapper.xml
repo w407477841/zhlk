@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.weight.ReportFormsMapper">
+<select id="oneReportFormsByPage" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+<!-- 
+select twrh.id,twrh.bId,userName,shipId,wId,grainProperty,grainVariety,buyPrice/50 buyPrice,sumMoney,trueWeight,payStatus,left(payDate,11) payDate,left(addDate,11) addDate,payType,payAuthor,inOrOut
+,twqc.`level`,
+tw.wName,
+twl.wName wlName
+from 
+t_weight_report_harbor as twrh,
+t_weight_quality_check as twqc,
+t_warehouse as tw,
+t_warehouse_location as twl
+ where 
+twrh.totalWeight is not null AND
+twrh.bId = twqc.bId AND
+twrh.wId = tw.id AND
+tw.wLocation = twl.id
+ -->
+ select twrh.id,twrh.bId,userName,shipId,wId,grainProperty,grainVariety,buyPrice/50 buyPrice,sumMoney,totalWeight,trueWeight,payStatus,left(payDate,11) payDate,left(reportDate,11) reportDate,payType,payAuthor,inOrOut
+,twqc.`level`,
+tw.wName,
+twl.wName wlName
+from 
+(select * from t_weight_report_harbor where totalWeight is not null)
+ as twrh LEFT JOIN
+t_weight_quality_check as twqc ON twrh.bId = twqc.bId LEFT JOIN
+t_warehouse as tw on twrh.wId = tw.id LEFT JOIN
+t_warehouse_location as twl ON tw.wLocation = twl.id
+where 1=1
+<if test="bId != null and bId != ''">
+and twrh.bId = #{bId}
+</if>
+<if test="wlId != null and wlId != ''">
+and twl.id = #{wlId}
+</if>
+<if test="wId != null and wId != ''">
+and twrh.wId = #{wId}
+</if>
+<if test="payDate != null and payDateEnd != ''">
+and left(twrh.payDate,11) between #{payDate} and #{payDateEnd}
+</if>
+<if test="addDate != null and addDateEnd != ''">
+and left(twrh.reportDate,11) between #{addDate} and #{addDateEnd}
+</if>
+<if test="WeightDate != null and WeightDateEnd != ''">
+and left(twrh.weightEndDate,11) between #{WeightDate} and #{WeightDateEnd}
+</if>
+<if test="IDCard != null and IDCard != ''">
+and twrh.IDCard = #{IDCard}
+</if>
+<if test="userName != null and userName != ''">
+and twrh.userName = #{userName}
+</if>
+<if test="shipId != null and shipId != ''">
+and twrh.shipId = #{shipId}
+</if>
+<if test="phoneNumber != null and phoneNumber != ''">
+and twrh.phoneNumber = #{phoneNumber}
+</if>
+<if test="inOrOut != null and inOrOut != ''">
+and twrh.inOrOut = #{inOrOut}
+</if>
+<if test="orderby != null and orderby != ''">
+ ${orderby}
+</if>
+
+</select>
+<select id="twoReportFormsByPage" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select left(payDate,11) payDate,SUM(sumMoney) sumMoney,COUNT(*) count,inOrOut 
+from t_weight_report_harbor 
+where 
+payStatus='结算完成' 
+<if test="addDate != null and addDate != '' and addDateEnd != null and addDateEnd != ''">
+AND reportDate between #{addDate} and #{addDateEnd}
+</if>
+<if test="payDate != null and payDate != '' and payDateEnd != null and payDateEnd != ''">
+AND payDate between #{payDate} and #{payDateEnd}
+</if>
+<if test="inOrOut != null and inOrOut != ''">
+and inOrOut = #{inOrOut}
+</if>
+<if test="inOrOut == null or inOrOut == ''">
+and inOrOut = '1'
+</if>
+GROUP BY
+left(payDate,11),inOrOut
+ORDER BY payDate DESC
+</select>
+<select id="threeReportFormsByPage" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+
+select wrh.reportDate,GROUP_CONCAT(wrh.sumMoney) sumMoney,GROUP_CONCAT(wrh.payStatus) payStatus,inOrOut,GROUP_CONCAT(wrh.count) count from (
+select 
+left(reportDate,11) reportDate,SUM(sumMoney) sumMoney,payStatus,inOrOut,COUNT(*) count
+from 
+t_weight_report_harbor 
+where 
+totalWeight is not null
+<if test="addDate != null and addDate != '' and addDateEnd != null and addDateEnd != ''">
+AND reportDate between #{addDate} and #{addDateEnd}
+</if>
+GROUP BY left(reportDate,11),payStatus,inOrOut
+) as wrh where 1=1
+<if test="inOrOut != null and inOrOut != ''">
+and wrh.inOrOut = #{inOrOut}
+</if>
+<if test="inOrOut == null or inOrOut == ''">
+and wrh.inOrOut = '1'
+</if>
+GROUP BY wrh.reportDate,wrh.inOrOut
+ORDER BY wrh.reportDate desc
+</select>
+<select id="fourReportFormsByPage" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select twrh.id,left(twrh.reportDate,11) reportDate,twrh.buyPrice/50 buyPrice,twrh.payStatus,twrh.bId,userName,IDCard,shipId,wId,grossWeight,tare,totalReduce,totalWeight,trueWeight,sumMoney,inOrOut,
+IFNULL(tweight.weightCount,0) weightCount,tw.wName,twl.wName wlName
+from 
+(select * from t_weight_report_harbor where totalWeight is not null)
+ as twrh LEFT JOIN
+(select tww.bId,count(tww.grossWeight) weightCount from t_weight_weighing as tww where tww.grossWeight is not null  GROUP BY tww.bId) as tweight
+ON twrh.bId = tweight.bId LEFT JOIN
+t_warehouse as tw ON twrh.wId=tw.id LEFT JOIN
+t_warehouse_location as twl ON tw.wLocation = twl.id
+where 1=1
+<if test="bId != null and bId != ''">
+and twrh.bId = #{bId}
+</if>
+<if test="wlId != null and wlId != ''">
+and twl.id = #{wlId}
+</if>
+<if test="wId != null and wId != ''">
+and twrh.wId = #{wId}
+</if>
+<if test="IDCard != null and IDCard != ''">
+and twrh.IDCard = #{IDCard}
+</if>
+<if test="userName != null and userName != ''">
+and twrh.userName = #{userName}
+</if>
+<if test="shipId != null and shipId != ''">
+and twrh.shipId = #{shipId}
+</if>
+<if test="phoneNumber != null and phoneNumber != ''">
+and twrh.phoneNumber = #{phoneNumber}
+</if>
+<if test="inOrOut != null and inOrOut != ''">
+and twrh.inOrOut = #{inOrOut}
+</if>
+ <if test="orderby != null and orderby != ''">
+ ${orderby}
+</if>
+</select>
+<select id="fiveReportFormsByPage" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select wId,grainVariety,grainProperty,
+SUM(totalWeight) totalWeight,
+SUM(trueWeight) trueWeight,
+SUM(totalWeight)-SUM(trueWeight) reduceWeight,
+SUM(sumMoney) sumMoney,
+SUM(sumMoney)/SUM(trueWeight) buyPrice,
+inOrOut,
+payStatus,
+tw.wName,
+twl.wName wlName
+from 
+t_weight_report_harbor as twrh,
+t_warehouse as tw,
+t_warehouse_location as twl
+where
+twrh.totalWeight is not null AND
+twrh.wId = tw.id AND
+tw.wLocation = twl.id
+<if test="inOrOut != null and inOrOut != ''">
+and inOrOut = #{inOrOut}
+</if>
+<if test="inOrOut == null or inOrOut == ''">
+and inOrOut = '1'
+</if>
+<if test="wId != null and wId != ''">
+and wId = #{wId}
+</if>
+<if test="wlId != null and wlId != ''">
+and twl.id = #{wlId}
+</if>
+<if test="grainVariety != null and grainVariety != ''">
+and grainVariety = #{grainVariety}
+</if>
+<if test="grainProperty != null and grainProperty != ''">
+and grainProperty = #{grainProperty}
+</if>
+<if test="addDate != null and addDate != '' and addDateEnd != null and addDateEnd != ''">
+AND reportDate between #{addDate} and #{addDateEnd}
+</if>
+
+GROUP BY wId,inOrOut,payStatus
+</select>
+<select id="sixReportFormsByPage" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select twrh.*,bpLowerMoney,bpLowerMoney-sumMoney surplus
+from 
+(select payPlanId,sum(sumMoney) sumMoney from t_weight_report_harbor where payPlanId is not null AND inOrOut = '2'
+<if test="payPlanId != null and payPlanId != ''">
+AND payPlanId = #{payPlanId}
+</if>
+ GROUP BY payPlanId) as twrh 
+LEFT JOIN 
+(select bpBill,bpLowerMoney from t_bankroll_plan) tbp 
+ON
+twrh.payPlanId = tbp.bpBill
+</select>
+<select id="sevenReportFormsByPage" resultType="com.zyiot.entity.weight.ReportHarborFormMap">
+select tww.*,userName,shipId,wId,inOrOut,isAdd,tw.wName,twl.wName wlName FROM
+(select id,bId,grossWeight,grossWeightDate,tare,tarDate,weightPerson from t_weight_weighing) as tww
+LEFT JOIN t_weight_report_harbor as twrh ON tww.bId = twrh.bId
+LEFT JOIN t_warehouse as tw ON twrh.wId = tw.id 
+LEFT JOIN t_warehouse_location as twl ON tw.wLocation = twl.id
+where 1=1
+<if test="inOrOut != null and inOrOut != ''">
+and inOrOut = #{inOrOut}
+</if>
+<if test="bId != null and bId != ''">
+and tww.bId = #{bId}
+</if>
+<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+and (grossWeightDate between #{beginDate} and #{endDate}
+or tarDate between #{beginDate} and #{endDate})
+</if>
+<if test="orderby != null and orderby != ''">
+${orderby}
+</if>
+</select>
+</mapper>

@@ -1,0 +1,18 @@
+1.修改jdbc.properties
+   (1)主要修改 IP地址。如用户名密码不一致，也需要修改
+2.修改config.properties 
+	(1)appName:项目内涉及项目名的都会一起变更 
+	(2)appNameWidth:主要涉及主页左上角显示的项目名，防止过短导致换行。  
+	(3)app:智慧粮库则改为zhlk，县级平台则改为xjpt
+	(4)licensekey:授权码
+	(5)needLogin: 1需要登录界面	 0不需要登录界面(用于演示)
+3.仓库点位添加(类型可选 仓库点位/仓外传感器点位)	
+
+
+4.t_warehouse_location 先加到县级平台 再将对应的库点数据复制到智慧粮库
+5.t_warehouse 先加到县级平台 再将对应的仓库数据复制到智慧粮库
+
+AppSecret=2fab094e25a645c89a0eced2e466f74d
+
+
+

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.weight.CarMapper">
+<select id="findByPage" resultType="com.zyiot.entity.weight.CarFormMap">
+select * from t_weight_car_archives where 1=1
+<if test="cId !=null and cId != ''">
+ and cId='${cId}'
+</if>
+<if test="bId !=null">
+ and bId='${bId}'
+</if>
+</select>
+<select id="findNotUsedByPage" resultType="com.zyiot.entity.weight.CarFormMap" parameterType="java.lang.String">
+select * from t_weight_car_archives where bId = '' or bId=#{0}
+</select>
+<select id="findCarById" resultType="com.zyiot.entity.weight.CarFormMap">
+select * from t_weight_car_archives where id=#{0}
+</select>
+
+<select id="findNotUsedCar" resultType="com.zyiot.entity.weight.CarFormMap">
+select * from t_weight_car_archives where RFID='' and bId=''
+</select>
+<select id="isUsed" resultType="com.zyiot.entity.weight.CarFormMap">
+select * from t_weight_car_archives where RFID=#{0}
+</select>
+
+<select id="findCarByBId" resultType="com.zyiot.entity.weight.CarFormMap"  parameterType="java.lang.String">
+select * from t_weight_car_archives where bId=#{0}
+</select>
+
+<update id="ClearUsedCarByBId"  parameterType="java.lang.String">
+update t_weight_car_archives set bId = '',RFID=null,RFIDName='',version = version+1 where bId=#{0}
+</update>
+<update id="ClearUsedCarById">
+update t_weight_car_archives set bId = '',RFID=null,RFIDName='',version = version+1 where id=#{0}
+</update>
+</mapper>

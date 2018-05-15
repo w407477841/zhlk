@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cunchuguanli.QualitativeMapper">
+<select id="findByPage" resultType="com.zyiot.entity.cunchuguanli.QualitativeFormMap">
+SELECT
+warehouse_id,
+warehouse_location,
+qChangeTime,
+qOldQualitative,
+qNewQualitative,
+qComment,
+warehouse,
+warehouse_l
+from (
+	select
+w.id warehouse,
+w.wLocation warehouse_l,
+ w.wName warehouse_id,	
+ wl.wName warehouse_location,
+ q.qChangeTime qChangeTime ,
+ c1.text qOldQualitative,
+ c2.text qNewQualitative,
+ q.qComment qComment
+ from t_qualitative q 
+ left join (select * from  t_codeitem  where codeid=11 ) c1 on q.qOldQualitative=c1.id 
+ left join (select * from  t_codeitem  where codeid=11 ) c2 on q.qNewQualitative=c2.id
+ left join  t_warehouse w on q.warehouse_id=w.id 
+ LEFT JOIN t_warehouse_location wl on w.wLocation = wl.id
+ ) t where 1=1 
+ <if test="warehouse_id!=null and warehouse_id!=''">
+  and t.warehouse_l like '%${warehouse_id}%'
+ </if>
+ <if test="warehouse_name!=null and warehouse_name!=''">
+  and t.warehouse_id like '%${warehouse_name}%'
+ </if>
+<if test="orderby!=''and orderby!=null">
+	${orderby}
+</if>
+</select>
+<!-- 查询  
+order by -s.storageID desc将字符窜转为数字排序
+
+ -->
+<select id="findCk" resultType="com.zyiot.entity.cunchuguanli.QualitativeFormMap">
+	select 
+s.storageID id ,
+w.wName wName,
+s.quanZhong quanZhong,
+c.text xingzhi
+ from t_storag_info s
+  LEFT JOIN
+   (select  wName,id from t_warehouse) w 
+   on s.storageID=w.id
+   LEFT JOIN
+(select * from t_codeitem where codeid=11)c  on s.quanZhong=c.id
+
+order by -s.storageID desc
+</select>
+
+</mapper>
+

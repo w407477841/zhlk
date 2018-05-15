@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.shebeiguanli.DaXingSheBeiBaoFeiMapper">
+<sql id="selectId">
+lew.id id,
+leId,
+lewCause,
+lewDate,
+lewAddDate,
+lew.version version,
+lewDataOperator,
+leNo,
+leName
+</sql>
+<select id="findByPage" resultType="com.zyiot.entity.shebeiguanli.DaXingSheBeiBaoFeiFormMap">
+select <include refid="selectId"></include> from (select id,leNo,leName from (select id,leNo,leName from t_large_equipment_his where lehType ='wreck' ORDER BY lehOpDate desc) le GROUP BY id) lea,t_large_equipment_wreck lew where lea.id = lew.leId
+<if test="leName !=null and leName !=''">
+and leName like '%${leName}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findDaXingSheBeiBaoFeiById" resultType="com.zyiot.entity.shebeiguanli.DaXingSheBeiBaoFeiFormMap">
+select <include refid="selectId"></include> from (select id,leNo,leName from (select id,leNo,leName from t_large_equipment_his where lehType ='wreck' ORDER BY lehOpDate desc) le GROUP BY id) lea,t_large_equipment_wreck lew where lea.id = lew.leId and lew.id=#{0}
+</select>
+</mapper>
+

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.fuwupingtai.YuYueJiaoLiangMapper">
+
+<select id="findByPage" resultType="com.zyiot.entity.fuwupingtai.YuYueJiaoLiangFormMap">
+select tag.*,
+tc.text Variety
+from 
+t_appointment_grain as tag,
+t_codeitem as tc
+where tag.agVariety = tc.id AND
+tc.codeid=12
+<if test="agBill !=null and agBill !=''">
+and tag.agBill like '%${agBill}%'
+</if>
+<if test="agIDCard !=null and agIDCard !=''">
+and tag.agIDCard like '%${agIDCard}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findYuYueJiaoLiangById" resultType="com.zyiot.entity.fuwupingtai.YuYueJiaoLiangFormMap">
+select * from t_appointment_grain where id=#{0}
+</select>
+</mapper>
+

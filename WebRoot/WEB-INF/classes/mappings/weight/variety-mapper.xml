@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.weight.VarietyMapper">
+<select id="findByPage" resultType="com.zyiot.entity.weight.VarietyFormMap">
+select * from t_weight_grain_variety where 1=1
+</select>
+<select id="findVarietyById" resultType="com.zyiot.entity.weight.VarietyFormMap">
+select * from t_weight_grain_variety where id=#{0}
+</select>
+<select id="findEnableVariety" resultType="com.zyiot.entity.weight.VarietyFormMap">
+select * from t_weight_grain_variety where isEnable = 2 order by id
+</select>
+<select id="findAll" resultType="com.zyiot.entity.weight.VarietyFormMap">
+select * from t_weight_grain_variety
+</select>
+<select id="findTopMenuVariety" resultType="com.zyiot.entity.weight.VarietyFormMap">
+select id,text,definedText from t_weight_grain_variety where parentId = 0 order by id 
+</select>
+</mapper>

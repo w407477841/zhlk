@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.StorageInfoMapper">
+<select id="classifybykudian" parameterType="java.util.HashMap" resultType="com.zyiot.entity.StorageInfoFormMap">
+	SELECT sum(cangKu) y,(select text from t_codeitem where codeid='12' and id=t_storag_info.name) name  FROM t_storag_info WHERE source=#{source} GROUP BY name
+</select>
+<select id="classifybyquan" parameterType="java.util.HashMap" resultType="com.zyiot.entity.StorageInfoFormMap">
+	SELECT sum(cangKu) y,(select text from t_codeitem where codeid='11' and id=t_storag_info.quanZhong) name FROM t_storag_info  WHERE source=#{source} GROUP BY quanZhong
+</select>
+<select id="classifyByNo" parameterType="java.util.HashMap" resultType="com.zyiot.entity.StorageInfoFormMap">
+	
+SELECT twgv.text as name,tsi.cangKu,tsi.`code`,twgp.text as quanzhong,tw.wName as storageID from (select * from t_storag_info where source=#{source} ORDER BY storageID) as tsi LEFT JOIN t_weight_grain_property as twgp
+ON tsi.quanZhong = twgp.id LEFT JOIN t_weight_grain_variety as twgv
+ON tsi.`name` = twgv.id LEFT JOIN t_warehouse as tw 
+ON tsi.storageID = tw.id
+</select>
+<select id="findLocation"  resultType="com.zyiot.entity.StorageInfoFormMap">
+	SELECT id,wNo,wName FROM t_warehouse_location;
+</select>
+
+<select id="findBreeds"  resultType="com.zyiot.entity.StorageInfoFormMap">
+	SELECT id,text FROM t_codeitem WHERE codeid=12 AND id is NOT null 
+</select>
+
+<select id="findProperties"  resultType="com.zyiot.entity.StorageInfoFormMap">
+SELECT id,text FROM t_codeitem WHERE codeid=11
+</select>
+
+<select id="findContrastLocation"  resultType="java.util.HashMap">
+SELECT qiyemingcheng code FROM `t_contrast_location` group by qiyemingcheng
+</select>
+
+<select id="findContrastStation"  parameterType="java.util.HashMap" resultType="java.util.HashMap">
+SELECT wName,WNo FROM `t_warehouse_location` where wNo in (SELECT location_no FROM `t_contrast_location` where qiyemingcheng=#{location})
+</select>
+
+<select id="queryLibraryInfo" parameterType="java.util.HashMap" resultType="com.zyiot.entity.StorageInfoFormMap">
+select i.createtime,l.wName,substring_index(i.StorageID, ',' ,- 1) StorageID,c.text breed,c1.text property,abs(sum(w.TotalWeight-w.CarWeight)) weights ,q.price ,
+abs(sum(w.TotalWeight-w.CarWeight)*q.price/100) amounts,
+case when i.inorout=1 then '出库' else '入库' end inorout,
+case when i.Payway=3 then '是' else '否' end payway
+from w_instorage i
+left join t_codeitem c on c.codeid=12 and c.id=i.breed 
+left join t_codeitem c1 on c1.codeid=11 and c1.id=i.property 
+left join w_weighting  w on  i.id=left(w.id,14) 
+left join w_quality q on i.id=q.id
+left join t_warehouse_location l on i.location=l.wNo
+where i.state=3
+	<if test="timestart !='' and timestart!=null and timeend !='' and timeend!=null ">
+	and DATE(data_Time) between #{timestart} and #{timeend}
+</if>
+	<if test="library_sel !='' and library_sel!=null ">
+	and i.location =#{library_sel}
+</if>
+
+group by i.id order by i.createtime desc
+</select>
+
+		<select id="instancWeight" parameterType="java.util.HashMap"	resultType="java.util.HashMap">
+		select i.location,i.houseid,sum(i.weight) weight,i.siNature property,i.siVariety breed,i.siYear from(
+				SELECT
+			location,houseid,weight, case when isnull(a) then siVariety else a end siVariety,
+			case when isnull(b) then siNature else b end siNature,
+			siYear
+		FROM
+			(
+				SELECT
+					i.location_id location,
+					i.warehouse_id houseid,
+					i.siQuantity weight,
+					(select text from t_codeitem where codeid=12 and id=f.name) a,
+					(select text from t_codeitem where codeid=11 and id=f.quanZhong) b,
+					c1.text siNature,
+					c.text siVariety,
+					i.siYear
+				FROM
+					`t_store_info` i
+				LEFT JOIN t_codeitem c ON c.codeid = 12 AND c.id = i.siVariety
+				LEFT JOIN t_codeitem c1 ON c1.codeid = 11 AND c1.id = i.siNature
+				left join t_storag_info f on f.source=i.location_id and f.storageID=i.warehouse_id
+				ORDER BY siPutin DESC
+			) a
+		GROUP BY
+			a.location,
+			a.houseid
+		
+		
+		union 
+		SELECT
+			 i.location,
+			 substring_index(i.storageid,',',1) houseid,
+			 sum(w.TotalWeight-w.CarWeight) weight,
+			  c.text siVariety,
+			 c1.text siNature,
+			
+				null siYear
+			FROM
+			w_instorage i
+		  LEFT JOIN w_weighting w ON i.id = LEFT (w.id, 14)
+			left join t_codeitem c on c.codeid=12 and i.breed=c.id
+			left join t_codeitem c1 on c1.codeid=11 and i.Property=c1.id
+		where i.State=3  
+		GROUP BY i.location, i.StorageID) i 
+		where  i.location=#{location} and i.houseid=#{houseid}
+		group by i.location ,i.houseid
+			
+	</select> 
+<select id="findVarietyAndPropertyByWarehouseId" resultType="com.zyiot.entity.StorageInfoFormMap">
+select tsi.*,tc1.text as variety,tc2.text as property,tcode.text packageText from (select id,name,quanZhong,cangKu,packageWay,buyYear from t_storag_info where storageID=#{0}) as tsi
+LEFT JOIN t_weight_grain_variety AS tc1 ON tsi. NAME = tc1.id
+LEFT JOIN t_weight_grain_property AS tc2 ON tsi.quanZhong = tc2.id
+LEFT JOIN (select id,text from t_codeitem where codeid = '26') as tcode ON tsi.packageWay = tcode.id
+</select>
+	
+	<update id="updateStorageByStorageID" >
+	update t_storag_info set <if test="quanZhong!=null and quanZhong!=''">quanZhong='${quanZhong}' ,</if><if test="name !=null and name !=''"> name='${name}',</if> cangKu=cangKu+${cangKu} where storageID=${storageID}
+	</update>
+	
+		<update id="updateStorageByLiushui" >
+	update t_storag_info set cangKu=cangKu+${cangKu} where storageID=(SELECT left(storageID,10) FROM `w_instorage` where left('${id}',14)=ID)
+	</update>
+	
+	
+	
+		<update id="updateStorageBybasicid" >
+	update t_storag_info set cangKu=cangKu+${cangKu} where storageID=(SELECT left(storageID,10) FROM `w_instorage` where left((select id from w_weighting where basicid='${basicid}'),14)=ID)
+	</update>
+	
+	
+<select id="findCurrentStorageByPage" resultType="com.zyiot.entity.StorageInfoFormMap">
+	select tsi.id,tsi.cangKu,tsi.buyYear,
+twgv.text variety,twgp.text property,
+tw.wName,twl.wName wlName,tc.text packWay,tpa.paName,
+ttp.maxTemperature,ttp.minTemperature,tmoney.totalMoney,tcheck.sf
+from 
+t_storag_info as tsi LEFT JOIN t_weight_grain_property as twgp
+ON tsi.quanZhong = twgp.id LEFT JOIN t_weight_grain_variety as twgv
+ON tsi.`name` = twgv.id LEFT JOIN t_warehouse as tw
+ON tsi.storageID = tw.id LEFT JOIN t_warehouse_location as twl
+ON tsi.source = twl.id LEFT JOIN (select * from t_codeitem where codeid=26) as tc
+ON tsi.packageWay = tc.id LEFT JOIN t_warehouse_archives as twa
+ON tsi.storageID = twa.wId LEFT JOIN t_person_archives as tpa
+ON twa.waStoreman = tpa.id LEFT JOIN (
+select tTemp.* from (select wWarehouse,maxTemperature,minTemperature,cjsj from t_warehouse_info ORDER BY cjsj DESC) as tTemp GROUP BY tTemp.wWarehouse) as ttp
+ON tsi.storageID = ttp.wWarehouse LEFT JOIN (select * from (select wId,emptyDate from t_storage_empty_info ORDER BY emptyDate DESC) as tdate group by wId) as ttime
+ON tsi.storageID = ttime.wId LEFT JOIN (
+select twrh.wId,sum(twrh.Money) as totalMoney from (select wId,inOrOut,addDate,IF(inOrOut='1',-1*sumMoney,sumMoney) as Money from t_weight_report_harbor ) as twrh LEFT JOIN (select * from (select wId,emptyDate from t_storage_empty_info ORDER BY emptyDate DESC) as tdate group by wId) as tti
+ON twrh.wId = tti.wId
+where twrh.addDate>IFNULL(tti.emptyDate,"2010-01-01 00:00:00")
+GROUP BY wId
+) as tmoney 
+ON tsi.storageID = tmoney.wId LEFT JOIN
+(
+select tquality.wId,tquality.sf from (
+select * from (select wId,sf,checkDate from t_quality_manager ORDER BY checkDate) as tqm GROUP BY tqm.wId) as tquality LEFT JOIN
+(
+select * from (select wId,emptyDate from t_storage_empty_info ORDER BY emptyDate DESC) as tdate group by wId
+) AS tempty ON tquality.wId = tempty.wId
+where checkDate>IFNULL(tempty.emptyDate,"2010-01-01 00:00:00")
+) as tcheck
+ON tsi.storageID = tcheck.wId
+WHERE 1=1 
+<if test="locationList != null and locationList.size()>0">
+ AND tsi.source in
+<foreach collection="locationList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+</if>
+<if test="propertyList != null and propertyList.size()>0">
+ AND tsi.quanZhong in
+<foreach collection="propertyList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+</if>
+<if test="varietyList != null and varietyList.size()>0">
+ AND LEFT(tsi.name,3) in
+<foreach collection="varietyList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+</if>
+ORDER BY tsi.source,tsi.storageID
+</select>
+<select id="findDetailStorageByPage" resultType="com.zyiot.entity.StorageInfoFormMap">
+select tsi.id,CAST(tsi.cangKu AS DECIMAL) as cangKu,
+left(tsi.`name`,3) name,tsi.quanZhong,
+tw.wName,twl.wName wlName,
+twgp.text grainProperty,twgv.text grainVariety,
+tcl.qiyemingcheng,
+tmoney.totalMoney,
+tmoney.totalMoney/tsi.cangKu as price
+from
+t_storag_info as tsi LEFT JOIN t_contrast_location as tcl
+ON tsi.source = tcl.location_no LEFT JOIN t_weight_grain_property as twgp
+ON tsi.quanZhong = twgp.id LEFT JOIN t_weight_grain_variety as twgv
+ON tsi.`name` = twgv.id LEFT JOIN t_warehouse as tw
+ON tsi.storageID = tw.id LEFT JOIN t_warehouse_location as twl
+ON tsi.source = twl.id LEFT JOIN t_warehouse_archives as twa
+ON tsi.storageID = twa.wId  LEFT JOIN (select * from (select wId,emptyDate from t_storage_empty_info ORDER BY emptyDate DESC) as tdate group by wId) as ttime
+ON tsi.storageID = ttime.wId LEFT JOIN (
+select twrh.wId,sum(twrh.Money) as totalMoney from (select wId,inOrOut,addDate,IF(inOrOut='1',-1*sumMoney,sumMoney) as Money from t_weight_report_harbor ) as twrh LEFT JOIN (select * from (select wId,emptyDate from t_storage_empty_info ORDER BY emptyDate DESC) as tdate group by wId) as tti
+ON twrh.wId = tti.wId
+where twrh.addDate>IFNULL(tti.emptyDate,"2010-01-01 00:00:00")
+GROUP BY wId
+) as tmoney
+ON tsi.storageID = tmoney.wId
+where 1=1
+<if test="locationList != null and locationList.size()>0">
+ AND tsi.source in
+<foreach collection="locationList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+</if>
+<if test="propertyList != null and propertyList.size()>0">
+ AND tsi.quanZhong in
+<foreach collection="propertyList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+</if>
+<if test="varietyList != null and varietyList.size()>0">
+ AND LEFT(tsi.name,3) in
+<foreach collection="varietyList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+</if>
+ORDER BY tsi.source,tsi.storageID
+</select>
+<select id="findCurrentTotalWeight" resultType="com.zyiot.entity.StorageInfoFormMap">
+select tsi.*,twgp.text grainProperty from (
+select quanZhong,LEFT(`name`,3) as variety,SUM(cangKu) as weight from t_storag_info
+where source in
+<foreach collection="LocationList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+and LEFT(`name`,3) in
+<foreach collection="varietyList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+
+ GROUP BY quanZhong,LEFT(`name`,3)
+)as tsi LEFT JOIN t_weight_grain_property as twgp ON
+tsi.quanZhong = twgp.id 
+WHERE 1=1 
+<if test="list != null and list.size()>0">
+ AND quanZhong in
+<foreach collection="propertyList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+</if>
+</select>
+<select id="findAllWarehouseLocation" resultType="com.zyiot.entity.StorageInfoFormMap">
+select DISTINCT(source) from t_storag_info
+</select>
+<select id="findAllGrainProperty" resultType="com.zyiot.entity.StorageInfoFormMap">
+select twgp.id quanZhong,twgp.text from (select DISTINCT(quanZhong) as property from t_storag_info) tsi
+LEFT JOIN t_weight_grain_property as twgp ON tsi.property = twgp.id
+</select>
+<select id="findAllGrainVariety" resultType="com.zyiot.entity.StorageInfoFormMap">
+select DISTINCT(LEFT(name,3)) as variety from t_storag_info
+</select>
+<select id="findSumStorage" resultType="com.zyiot.entity.StorageInfoFormMap">
+select LEFT(tsi.name,3) name,tsi.quanZhong,SUM(tsi.cangKu) totalWeight,tcl.qiyemingcheng,tcl.tongyixinyongdaima from 
+(
+select * from t_storag_info where 1=1
+<if test="LocationList != null and LocationList.size()>0">
+ AND source in
+<foreach collection="LocationList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+</if>
+<if test="propertyList != null and propertyList.size()>0">
+ AND quanZhong in
+<foreach collection="propertyList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+</if><if test="varietyList != null and varietyList.size()>0">
+ AND LEFT(`name`,3) in
+<foreach collection="varietyList" open="(" close=")" item="item" index="index" separator=",">
+#{item}
+</foreach>
+</if>
+)
+ as tsi LEFT JOIN
+t_contrast_location as tcl ON tsi.source = tcl.location_no
+
+GROUP BY tcl.tongyixinyongdaima,tsi.quanZhong,LEFT(tsi.`name`,3)
+</select>
+<select id="findByWarehouseId" resultType="com.zyiot.entity.StorageInfoFormMap">
+ select * from t_storag_info where storageID = #{0}
+</select>
+</mapper>

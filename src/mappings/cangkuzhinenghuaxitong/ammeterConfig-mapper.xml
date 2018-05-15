@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cangkuzhinenghuaxitong.AmmeterConfigMapper">
+	<sql id="selectId">
+		id,ip,port,instructions,cangkudianwei,name
+	</sql>
+	<select id="findAmmeterConfigByPage"
+		resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterConfigFormMap">
+		select
+		<include refid="selectId"></include>
+		from t_ammeter_config where 1=1
+		<if test="id!=null and id!=''"> and id='${id}'</if>
+		<if test="name!=null and name!=''"> and name like '%${name}%'</if>
+		<if test="cangkudianwei!=null and cangkudianwei!=''"> and cangkudianwei='${cangkudianwei}'</if>
+	</select>
+
+	<select id="findCangKuDianWei"
+		resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterConfigFormMap">
+		select
+		id,name,cLeft,cTop,location_id,lx,warehouse_id,(select count(1) from
+		t_ammeter_config where cangkudianwei =t_cangkudianwei.id) count from
+		t_cangkudianwei where id in(
+		SELECT cangkudianwei FROM
+		`t_ammeter_config`)
+	</select>
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.zhiliangguanli.QualityManagerMapper">
+<select id="findQualityManagerByPage" resultType="com.zyiot.entity.zhiliangguanli.QualityManagerFormMap">
+select 
+tqm.*,
+tw.wName,
+twl.wName wlName
+from 
+t_quality_manager tqm,
+t_warehouse as tw,
+t_warehouse_location as twl
+
+WHERE tqm.wId = tw.id AND
+tw.wLocation = twl.id AND
+qualityType = #{qualityType}
+<if test="wlId != null and wlId != ''">
+ AND twl.id = #{wlId}
+</if>
+<if test="wId != null and wId != ''">
+ AND tw.id = #{wId}
+</if>
+<if test="checkBeginDate != null and checkBeginDate != '' and checkEndDate != null and checkEndDate != ''">
+ AND tqm.checkDate between #{checkBeginDate} and #{checkEndDate}
+</if>
+<if test="orderby != null and orderby != ''">
+ ${orderby}
+</if>
+</select>
+<select id="findQualityManagerById" resultType="com.zyiot.entity.zhiliangguanli.QualityManagerFormMap">
+select 
+tqm.*,
+tw.wLocation wlId
+from 
+t_quality_manager tqm,
+t_warehouse as tw
+WHERE tqm.wId = tw.id AND
+tqm.id = #{0}
+</select>
+<select id="findQualityManagerNumber" resultType="java.lang.String">
+select MAX(dNumber) from t_quality_manager where LEFT(dNumber,8) = #{0}
+</select>
+
+
+
+
+</mapper>

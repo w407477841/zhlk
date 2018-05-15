@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.jichuziliao.RenYuanDangAnMapper">
+<sql id="selectId">
+id,
+paName,
+paSex,
+paTelephone,
+paEmail,
+paOfficePhone,
+paNation,
+paQQ,
+paBirthday,
+paDegree,
+paHealth,
+paWorkLicence,
+paDepartment,
+paDuty,
+paDataOperator,
+version
+</sql>
+<select id="findByPage" resultType="com.zyiot.entity.jichuziliao.RenYuanDangAnFormMap">
+
+select <include refid="selectId"></include> from t_person_archives where 1=1
+<if test="paName !=null and paName !=''">
+and paName like '%${paName}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findRenYuanDangAnById" resultType="com.zyiot.entity.jichuziliao.RenYuanDangAnFormMap">
+select <include refid="selectId"></include> from t_person_archives where id=#{0}
+</select>
+</mapper>
+

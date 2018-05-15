@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cangkuzhinenghuaxitong.AmmeterDataMapper">
+<sql id="selectId">
+id,reading,isError,type,acquisitionTime,energy,warehouse
+</sql>
+<select id="findAmmeterDataByPage" resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterDataFormMap">
+select <include refid="selectId"></include> from t_ammeter_data where 1=1 
+<if test="id!=null and id!=''"> and id='${id}'</if> 
+</select>
+<!-- 查询所有智能电表，并带上当昨天自动读的数据 -->
+<select id="findAmmeters" resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterConfigFormMap">
+SELECT
+	*, (
+		SELECT
+			reading
+		FROM
+			t_ammeter_data
+		WHERE
+			type = 0
+			AND ammeter = t_ammeter_config.id
+		ORDER BY
+			acquisitionTime DESC
+		LIMIT 0,
+		1
+	) reading,
+	(
+		SELECT
+			acquisitionTime
+		FROM
+			t_ammeter_data
+		WHERE
+			type = 0
+		AND ammeter = t_ammeter_config.id
+		ORDER BY
+			acquisitionTime DESC
+		LIMIT 0,
+		1
+	) time
+FROM
+	`t_ammeter_config`
+
+</select>
+<select id="sumEnergy"  resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterDataFormMap">
+select sum(energy) sum from t_ammeter_data where ammeter='${ammeter}' and type=0
+</select>
+
+<!--  用于按日期 数据展示 -->
+<select id="findEnergyDayList" resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterDataFormMap">
+
+SELECT GROUP_CONCAT(energy) energys,time ,GROUP_CONCAT(reading) readings ,GROUP_CONCAT(id) ids, sum(energy) energysum,sum(reading) readingsum,wName from (
+SELECT
+	t1.energy  ,left(t1.acquisitionTime ,10) time,t1.reading,t2.id,t4.wName from  t_ammeter_data t1
+LEFT JOIN t_ammeter_config t2 ON t1.ammeter = t2.id 
+left join t_cangkudianwei t3 on t3.id =t2.cangkudianwei
+left join t_warehouse t4 on t3.warehouse_id =t4.id
+ where t1.type=0   and left(t1.acquisitionTime ,10) >='${time1}'  and left(t1.acquisitionTime ,10) &lt;='${time2}'   ORDER BY time, t2.id
+) t GROUP BY  time ,wName 
+
+
+</select>
+
+<select id="findEnergyMonList" resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterDataFormMap">
+select time ,sum(energy) energysum,wName,SUM(reading) readingsum,GROUP_CONCAT(energy) energys,GROUP_CONCAT(reading) readings   from (
+SELECT energy ,time ,reading  ,id, wName from (
+SELECT
+	t1.energy  ,left(t1.acquisitionTime ,7) time,t1.reading,t2.id,t4.wName from  t_ammeter_data t1
+LEFT JOIN t_ammeter_config t2 ON t1.ammeter = t2.id 
+left join t_cangkudianwei t3 on t3.id =t2.cangkudianwei
+left join t_warehouse t4 on t3.warehouse_id =t4.id
+ where t1.type=0   and left(t1.acquisitionTime ,10) >='${time1}'  and left(t1.acquisitionTime ,10) &lt;='${time2}'   ORDER BY acquisitionTime, t2.id
+) t GROUP BY time,id) t GROUP BY time , wName
+</select>
+
+<select id="findEnergyQuaList" resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterDataFormMap">
+SELECT
+	time,
+	sum(energy) energysum,
+	wName,
+	SUM(reading) readingsum,
+	GROUP_CONCAT(energy) energys,
+	GROUP_CONCAT(reading) readings
+FROM
+	(
+		SELECT
+			energy,
+			CONCAT(`YEAR`,'【',jd,'】') time,
+			reading,
+			id,
+			wName
+		FROM
+			(
+				SELECT
+					t1.energy,
+					LEFT (t1.acquisitionTime, 4) YEAR,
+					CASE substring(t1.acquisitionTime, 6, 2)
+					WHEN '01' THEN
+					'第1季度'
+					WHEN '02' THEN
+					'第1季度'
+				WHEN '03' THEN
+					'第1季度'
+				WHEN '04' THEN
+					'第2季度'
+				WHEN '05' THEN
+					'第2季度'
+				WHEN '06' THEN
+					'第2季度'
+				WHEN '07' THEN
+					'第3季度'
+				WHEN '08' THEN
+					'第3季度'
+				WHEN '09' THEN
+					'第3季度'
+				WHEN '10' THEN
+					'第4季度'
+				WHEN '11' THEN
+					'第4季度'
+				WHEN '12' THEN
+					'第4季度'
+				END AS jd,
+				t1.reading,
+				t2.id,
+				t4.wName
+			FROM
+				t_ammeter_data t1
+			LEFT JOIN t_ammeter_config t2 ON t1.ammeter = t2.id
+			LEFT JOIN t_cangkudianwei t3 ON t3.id = t2.cangkudianwei
+			LEFT JOIN t_warehouse t4 ON t3.warehouse_id = t4.id
+			WHERE
+				t1.type = 0
+			AND LEFT (t1.acquisitionTime, 10) >= '${time1}'
+			AND LEFT (t1.acquisitionTime, 10) &lt;= '${time2}'
+			ORDER BY
+				acquisitionTime,
+				t2.id
+			) t
+		GROUP BY
+			time,
+			id
+	) t
+GROUP BY
+	time,
+	wName
+</select>
+
+<!--  用于按日期 能耗趋势图 -->
+<select id="findEnergy" resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterDataFormMap">
+SELECT
+	t1.time time, sum(t1.energy) energy , t4.wName ,t4.id from (
+		SELECT
+			id,
+			reading,
+			isError,
+			type,
+			LEFT (acquisitionTime, 10) time,
+			energy,
+			ammeter
+		FROM
+			`t_ammeter_data`
+		WHERE
+			LEFT (acquisitionTime, 10) >= '${time1}' and LEFT(acquisitionTime, 10)&lt;='${time2}'
+		AND type = 0
+	) t1
+LEFT JOIN t_ammeter_config t2 ON t1.ammeter = t2.id
+LEFT JOIN t_cangkudianwei t3 ON t2.cangkudianwei = t3.id
+LEFT JOIN t_warehouse t4 ON t3.warehouse_id = t4.id
+
+GROUP BY t4.id ,time order by id,time
+
+
+</select>
+
+<select id="findEnergyMon" resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterDataFormMap">
+SELECT
+	t1.time time, sum(t1.energy) energy , t4.wName ,t4.id from (
+		SELECT
+			id,
+			reading,
+			isError,
+			type,
+			LEFT (acquisitionTime, 7) time,
+			energy,
+			ammeter
+		FROM
+			`t_ammeter_data`
+		WHERE
+			LEFT (acquisitionTime, 10) >= '${time1}' and LEFT(acquisitionTime, 10)&lt;='${time2}'
+		AND type = 0
+	) t1
+LEFT JOIN t_ammeter_config t2 ON t1.ammeter = t2.id
+LEFT JOIN t_cangkudianwei t3 ON t2.cangkudianwei = t3.id
+LEFT JOIN t_warehouse t4 ON t3.warehouse_id = t4.id
+
+GROUP BY time,t4.id ,time order by id,time
+
+</select>
+
+<select id="findEnergyQua" resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterDataFormMap">
+SELECT
+	CONCAT(year,'【',jd,'】') time, sum(t1.energy) energy , t4.wName ,t4.id from (
+		SELECT
+			id,
+			reading,
+			isError,
+			type,
+			LEFT (acquisitionTime, 4) YEAR,
+			CASE  when SUBSTRING(acquisitionTime,6,2)>'00' and  SUBSTRING(acquisitionTime,6,2)&lt;'04' THEN '第1季度'
+						when SUBSTRING(acquisitionTime,6,2)>'03' and  SUBSTRING(acquisitionTime,6,2)&lt;'07' THEN '第2季度'		
+						when SUBSTRING(acquisitionTime,6,2)>'06' and  SUBSTRING(acquisitionTime,6,2)&lt;'10' THEN '第3季度'
+						when SUBSTRING(acquisitionTime,6,2)>'09' and  SUBSTRING(acquisitionTime,6,2)&lt;'13' THEN '第4季度'			
+				END as jd,
+energy,
+			ammeter
+		FROM
+			`t_ammeter_data`
+		WHERE
+			LEFT (acquisitionTime, 10) >= '${time1}' and LEFT(acquisitionTime, 10)&lt;='${time2}'
+		AND type = 0
+	) t1
+LEFT JOIN t_ammeter_config t2 ON t1.ammeter = t2.id
+LEFT JOIN t_cangkudianwei t3 ON t2.cangkudianwei = t3.id
+LEFT JOIN t_warehouse t4 ON t3.warehouse_id = t4.id
+
+GROUP BY time,t4.id ,time order by id,time
+</select>
+
+<select id="findCurrentReading" resultType="com.zyiot.entity.cangkuzhinenghuaxitong.AmmeterDataFormMap">
+SELECT
+	t5.acquisitionTime ,GROUP_CONCAT(t1.reading) readings,GROUP_CONCAT(ammeter) ammeters,SUM(reading) readingsum, t4.wName 
+FROM
+	t_ammeter_data t1
+LEFT JOIN t_ammeter_config t2 ON t1.ammeter = t2.id
+LEFT JOIN t_cangkudianwei t3 ON t3.id = t2.cangkudianwei
+LEFT JOIN t_warehouse t4 ON t4.id = t3.warehouse_id
+INNER JOIN (
+	SELECT
+		id,
+		max(acquisitionTime) acquisitionTime
+	FROM
+		t_ammeter_data where type=1
+	GROUP BY
+		ammeter
+) t5 ON t1.id=t5.id
+WHERE
+	type = 1
+GROUP BY wName 
+</select>
+</mapper>
+

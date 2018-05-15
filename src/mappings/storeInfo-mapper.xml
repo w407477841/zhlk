@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.StoreInfoMapper">
+<select id="findStorageByPage" parameterType="java.util.HashMap" resultType="com.zyiot.entity.StorageInfoFormMap">
+	select 
+(select text from t_codeitem where codeid='12' and id=t1.name) name  ,
+code,
+(select text from t_codeitem where codeid='11' and id=t1.quanZhong) quanZhong,
+cangKu,
+(select wName from t_warehouse where id=t1.storageID) storageID,
+(select wName from t_warehouse_location where wNo=t1.source)source,
+t1.id id, 
+(select text from t_codeitem where codeid='10' and id=t2.sdLevel ) sdLevel,
+t2.sdMoisture sdMoisture,
+t2.sdImpurity sdImpurity,
+t2.sdUnitweight sdUnitweight,
+t2.sdUnsoundgrain sdUnsoundgrain,
+t2.sdYellowrice sdYellowrice,
+t2.sdHeadricerate sdHeadricerate,
+t2.sdBrownricerate sdBrownricerate,
+'0' version,
+t2.sdHuskedriceinpeddy sdHuskedriceinpeddy 
+
+from t_storag_info t1 
+left join (
+select * from (select * from (select i.location, substring_index(i.houseid, ',' ,1) houseid,q.sf sdMoisture,q.zz sdImpurity,q.rz sdUnitweight,q.bwsld sdUnsoundgrain,q.hl sdYellowrice,q.zjml sdHeadricerate,q.ccl sdBrownricerate, q.level sdLevel,q.gwcm sdHuskedriceinpeddy 
+from t_qualitychain_instance_quality i
+left join w_quality q on i.qualityid=q.id
+left join t_codeitem c on c.codeid=10 and c.id=q.level
+order by dates desc) l group by l.houseid
+union all
+select i.source,i.storageid,d.sdMoisture ,d.sdImpurity,d.sdUnitweight,d.sdUnsoundgrain,d.sdYellowrice,d.sdHeadricerate,d.sdBrownricerate,d.sdHuskedriceinpeddy,d.sdLevel
+from t_storag_info i left join t_storage_detail d on i.id=d.storage_id) l group by l.location,l.houseid
+) t2 on t1.source=t2.location and t1.storageid=t2.houseid
+ where 1=1 
+ <if test="location!=null and location!=''">
+and t1.source ='${location}'
+</if>
+<if test="breed!=null and breed!=''">
+and t1.name='${breed}'
+</if>
+<if test="property!=null and property!=''">
+and t1.quanZhong='${property}'
+</if>
+<if test="id!=null and id!=''">
+and t1.id=${id}
+</if>
+ 
+ order by  t1.source,t1.storageid asc
+</select>
+
+
+<select id="findStorageByPage1" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	select 
+(select text from t_codeitem where codeid='12' and id=t1.name) name  ,
+code,
+(select text from t_codeitem where codeid='11' and id=t1.quanZhong) quanZhong,
+cangKu,
+(select wName from t_warehouse where id=t1.storageID) storageID,
+(select wName from t_warehouse_location where wNo=t1.source)source,
+t1.id id, 
+(select text from t_codeitem where codeid='10' and id=t2.sdLevel ) sdLevel,
+t2.sdMoisture sdMoisture,
+t2.sdImpurity sdImpurity,
+t2.sdUnitweight sdUnitweight,
+t2.sdUnsoundgrain sdUnsoundgrain,
+t2.sdYellowrice sdYellowrice,
+t2.sdHeadricerate sdHeadricerate,
+t2.sdBrownricerate sdBrownricerate,
+'0' version,
+t2.sdHuskedriceinpeddy sdHuskedriceinpeddy 
+
+from t_storag_info t1 
+left join (
+select * from (select * from (select i.location, substring_index(i.houseid, ',' ,1) houseid,q.sf sdMoisture,q.zz sdImpurity,q.rz sdUnitweight,q.bwsld sdUnsoundgrain,q.hl sdYellowrice,q.zjml sdHeadricerate,q.ccl sdBrownricerate, q.level sdLevel,q.gwcm sdHuskedriceinpeddy 
+from t_qualitychain_instance_quality i
+left join w_quality q on i.qualityid=q.id
+left join t_codeitem c on c.codeid=10 and c.id=q.level
+order by dates desc) l group by l.houseid
+union all
+select i.source,i.storageid,d.sdMoisture ,d.sdImpurity,d.sdUnitweight,d.sdUnsoundgrain,d.sdYellowrice,d.sdHeadricerate,d.sdBrownricerate,d.sdHuskedriceinpeddy,d.sdLevel
+from t_storag_info i left join t_storage_detail d on i.id=d.storage_id) l group by l.location,l.houseid
+) t2 on t1.source=t2.location and t1.storageid=t2.houseid
+ where 1=1 
+ <if test="location!=null and location!=''">
+and t1.source ='${location}'
+</if>
+<if test="breed!=null and breed!=''">
+and t1.name='${breed}'
+</if>
+<if test="property!=null and property!=''">
+and t1.quanZhong='${property}'
+</if>
+<if test="id!=null and id!=''">
+and t1.id=${id}
+</if>
+ 
+ order by  t1.source,t1.storageid asc
+</select>
+
+
+<select id="findStorageByCategory" resultType="com.zyiot.entity.StorageInfoFormMap">
+select
+ci.text text,
+si.`name` name,
+sum(si.cangKu)  total 
+from t_storag_info si,t_codeitem ci 
+where si.`name` = ci.id and ci.codeid='12' group by si.`name`;
+</select>
+
+
+<select id="findStorageByStorageID" resultType="com.zyiot.entity.StorageInfoFormMap" >
+select 
+(select text from t_codeitem where codeid='12' and id=t1.name) name  ,
+code,
+(select text from t_codeitem where codeid='11' and id=t1.quanZhong) quanZhong,
+cangKu,
+(select wName from t_warehouse where id=t1.storageID) storageID,
+(select wName from t_warehouse_location where wNo=t1.source)source,
+t1.id id, 
+(select text from t_codeitem where codeid='10' and id=t2.sdLevel ) sdLevel,
+t2.sdMoisture sdMoisture,
+t2.sdImpurity sdImpurity,
+t2.sdUnitweight sdUnitweight,
+t2.sdUnsoundgrain sdUnsoundgrain,
+t2.sdYellowrice sdYellowrice,
+t2.sdHeadricerate sdHeadricerate,
+t2.sdBrownricerate sdBrownricerate,
+t2.sdHuskedriceinpeddy sdHuskedriceinpeddy,
+t2.version version
+from t_storag_info t1 
+left join (SELECT
+	left(t4.houseid,10) storage_id,
+	t3.Sf sdMoisture,
+	t3.Zz sdImpurity,
+	t3.Rz sdUnitweight,
+	t3.Bwsld sdUnsoundgrain,
+	t3.Hl sdYellowrice,
+	t3.Zjml sdHeadricerate,
+	t3.CCL sdBrownricerate,
+	t3.Gwcm sdHuskedriceinpeddy,
+	t3.level sdLevel,
+	0 version
+FROM
+	(
+		SELECT
+			*
+		FROM
+			t_qualitychain_instance_quality
+		WHERE
+			dates = (
+				SELECT
+					max(dates)
+				FROM
+					t_qualitychain_instance_quality
+				WHERE
+					LEFT (houseid, 10) = '${storageID}'
+			)
+		LIMIT 0,
+		1
+	) t4
+LEFT JOIN w_quality t3 ON t4.qualityid = t3.ID) t2 on t1.storageID=t2.storage_id
+
+ where 1=1 and  t1.storageID='${storageID}'
+</select>
+
+<select id="findByWarehouseId" resultType="com.zyiot.entity.StorageInfoFormMap">
+select * from t_storag_info where storageID=#{0}
+</select>
+<select id="findStorageInfoById" resultType="com.zyiot.entity.StorageInfoFormMap">
+select * from t_storag_info where id=#{0}
+</select>
+<select id="findByPage" resultType="com.zyiot.entity.StorageInfoFormMap">
+select tsi.cangKu,
+tw.wName,
+twl.wName wlName,
+tc1.text category,
+tc2.text varity
+from 
+t_storag_info as tsi,
+t_warehouse as tw,
+t_warehouse_location as twl,
+t_codeitem as tc1,
+t_codeitem as tc2
+WHERE
+tsi.storageID = tw.id AND
+tsi.source = twl.id AND
+tc1.codeid = 11 AND
+tsi.quanZhong = tc1.id AND
+tc2.codeid = 12 AND
+tsi.`name` = tc2.id
+
+ORDER BY 
+tsi.source,tsi.storageID
+</select>
+<select id="findStoreByPage" resultType="com.zyiot.entity.StorageInfoFormMap">
+select tsi.id,
+tsi.cangKu,
+tsi.buyYear,
+tsi.storageID,
+tsi.source,
+tw.wName,
+twl.wName wlName,
+tc1.text category,
+tc2.text varity,
+tc3.text package
+from 
+t_storag_info as tsi LEFT JOIN
+t_warehouse as tw ON tsi.storageID = tw.id LEFT JOIN
+t_warehouse_location as twl ON tsi.source = twl.id LEFT JOIN
+(select * from t_codeitem as t WHERE t.codeid=11) as tc1 ON tsi.quanZhong = tc1.id LEFT JOIN
+(select * from t_codeitem as t WHERE t.codeid=12) as tc2 ON tsi.`name` = tc2.id LEFT JOIN
+(select * from t_codeitem as t WHERE t.codeid=26) as tc3 ON tsi.packageWay = tc3.id
+where 1=1
+<if test="wlId !=null and wlId !=''">
+and tsi.source = #{wlId}
+</if>
+<if test="wId !=null and wId !=''">
+and tsi.storageID = #{wId}
+</if>
+<if test="category !=null and category !=''">
+and tsi.quanzhong = #{category}
+</if>
+<if test="varity !=null and varity !=''">
+and tsi.name = #{varity}
+</if>
+ order by source,storageID
+</select>
+<select id="findStorageByWarehouse" resultType="com.zyiot.entity.StorageInfoFormMap">
+select * from t_storag_info where source=#{0} and storageID=#{1}
+</select>
+
+<select id="findCurrentStorageByPage" resultType="com.zyiot.entity.StorageInfoFormMap">
+select tsi.id,tsi.cangKu,tsi.buyYear,tw.wName,twl.wName wlName,twgv.text variety,twgp.text property,tsi.storageID
+ from (
+ select * from t_storag_info where 1=1
+<if test="source !=null and source !=''">
+and source = #{source}
+</if>
+ORDER BY storageID 
+ ) as tsi LEFT JOIN t_warehouse as tw
+ON tsi.storageID = tw.id LEFT JOIN t_warehouse_location as twl
+ON tsi.source = twl.id LEFT JOIN t_weight_grain_variety as twgv
+ON tsi.`name` = twgv.id LEFT JOIN t_weight_grain_property as twgp
+ON tsi.quanZhong = twgp.id
+</select>
+<select id="findStorageById" resultType="com.zyiot.entity.StorageInfoFormMap">
+select tsi.cangKu,tsi.buyYear,twgv.text variety,twgp.text property,tw.wName,tpa.paName,tc.`level`,
+tcl.kuqubianma,
+tcl.qiyemingcheng,
+tcl.tongyixinyongdaima,
+tcw.cangfangbianhao,
+tcw.huoweibianhao
+from (select * from t_storag_info where storageID = #{0}) as tsi LEFT JOIN t_warehouse as tw
+ON tsi.storageID = tw.id LEFT JOIN t_weight_grain_variety as twgv
+ON tsi.`name` = twgv.id LEFT JOIN t_weight_grain_property as twgp
+ON tsi.quanZhong = twgp.id LEFT JOIN t_contrast_location as tcl
+ON tsi.source = tcl.location_no LEFT JOIN t_contrast_warehouse as tcw
+ON tsi.storageID = tcw.warehose_id LEFT JOIN t_warehouse_archives AS twa
+ON tsi.storageID = twa.wId LEFT JOIN t_person_archives as tpa
+ON twa.waStoreman = tpa.id LEFT JOIN (
+select wId,level from (select * from t_quality_manager where wId = #{0}) as tqm where 
+tqm.checkDate>IFNULL((select emptyDate from t_storage_empty_info where wId=#{0} ORDER BY emptyDate DESC LIMIT 0,1),"2010-01-01 00:00:00")
+ORDER BY tqm.checkDate DESC LIMIT 0,1
+) as tc
+ON tsi.storageID = tc.wId
+
+</select>
+
+
+<update id="updateStorage" >
+update t_storag_info set name='${name}',code='${code}',quanZhong='${quanZhong}',cangKu='${cangKu}' where storageID='${storageID}' and source='${source}'
+</update>
+</mapper>

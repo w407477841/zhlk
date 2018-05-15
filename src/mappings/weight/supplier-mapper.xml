@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.weight.SupplierMapper">
+<select id="findByPage" resultType="com.zyiot.entity.weight.SupplierFormMap">
+select * from t_weight_supplier where 1=1
+<if test="userName !=null and userName != ''">
+ and userName='${userName}'
+</if>
+</select>
+<select id="findSupplierById"  resultType="com.zyiot.entity.weight.SupplierFormMap">
+select * from t_weight_supplier where id=#{0}
+</select>
+<select id="findSupplierByIDCardOrPhone"  resultType="com.zyiot.entity.weight.SupplierFormMap">
+select * from t_weight_supplier where cID=#{0} or phoneNumber=#{0}
+</select>
+
+</mapper>

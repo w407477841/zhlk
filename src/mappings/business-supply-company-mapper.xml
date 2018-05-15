@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.BusinessManagerMapper">
+	<select id="findCompanies" parameterType="java.util.HashMap"
+		resultType="com.zyiot.entity.BusinessGuestCompanyFormMap">
+		SELECT * FROM t_business_supply_company where 1=1
+		<if test="name!='' and name!=null ">
+			and name like CONCAT('%', #{name}, '%')
+		</if>
+		<if test="orderby !='' and orderby !=null ">
+			${orderby}
+		</if>
+	</select>
+</mapper>

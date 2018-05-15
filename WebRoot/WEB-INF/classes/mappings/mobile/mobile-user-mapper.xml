@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.mobile.MobileUserMapper">
+	<select id="findByPage" resultType="com.zyiot.entity.UserFormMap">
+		select tu.id,userName,accountName,locked,ar.`name`,ar.id roleId  from t_user as tu
+		LEFT JOIN app_user_role as aur ON tu.id = aur.userId LEFT JOIN
+		(select id,`name` from app_role) as ar ON aur.roleId = ar.id
+		where 1=1
+		<if test="userName != null and userName != ''">
+			and userName = #{userName}
+		</if>
+		<if test="accountName != null and accountName != ''">
+			and accountName = #{accountName}
+		</if>
+	</select>
+	<select id="findByUserId" resultType="com.zyiot.entity.UserFormMap">
+	select * from app_user_role where userId = #{0}
+	</select>
+	<insert id="addUserRole">
+	 insert into app_user_role(userId,roleId) values(#{userId},#{roleId})
+	</insert>
+	<update id="editUserRole">
+	update app_user_role set roleId = #{roleId} where userId = #{userId}
+	</update>
+</mapper>

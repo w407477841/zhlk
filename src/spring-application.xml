@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans-4.1.xsd   
+    http://www.springframework.org/schema/context   
+    http://www.springframework.org/schema/context/spring-context-4.1.xsd  
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+    http://www.springframework.org/schema/task 
+    http://www.springframework.org/schema/task/spring-task-4.1.xsd     
+    http://www.springframework.org/schema/aop 
+     http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+      http://www.springframework.org/schema/cache  
+        http://www.springframework.org/schema/cache/spring-cache-3.2.xsd"
+	default-lazy-init="false">
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+				<value>classpath:taskTime.properties</value>
+				<value>classpath:qitibaojing.properties</value>
+			</list>
+		</property>
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+	<!-- 定时器开关 开始 -->
+	<task:annotation-driven />
+
+	<context:component-scan base-package="com.zyiot.server" />
+	<context:component-scan base-package="com.zyiot.aop" />
+	<context:component-scan base-package="com.zyiot.task" />
+	<context:component-scan base-package="com.zyiot.webservcie.impl" />
+
+	<!-- 启动对@AspectJ注解的支持 -->
+	<aop:aspectj-autoproxy />
+
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="maxActive" value="20" />
+		<property name="initialSize" value="1" />
+		<property name="maxWait" value="60000" />
+		<property name="minIdle" value="1" />
+
+		<property name="timeBetweenEvictionRunsMillis" value="3000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+
+		<property name="validationQuery" value="SELECT 'x' FROM DUAL" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<!-- mysql 不支持 poolPreparedStatements -->
+		<!--<property name="poolPreparedStatements" value="true" /> -->
+		<!--<property name="maxPoolPreparedStatementPerConnectionSize" value="20" 
+			/> -->
+
+		<!-- 开启Druid的监控统计功能 -->
+		<property name="filters" value="stat" />
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<tx:annotation-driven />
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations">
+			<array>
+				<value>classpath:mappings/**/*-mapper.xml</value>
+			</array>
+		</property>
+		<property name="typeAliasesPackage" value="com.zyiot.entity" />
+		<property name="plugins">
+			<array>
+				<bean class="com.github.pagehelper.PageHelper">
+
+					<property name="properties">
+						<value>
+							dialect=mysql
+							reasonable=true
+							supportMethodsArguments=true
+							params=count=countSql
+							autoRuntimeDialect=true
+						</value>
+					</property>
+				</bean>
+				<bean class="com.zyiot.interceptor.UtilInterceptor">
+				</bean>
+				<bean class="com.zyiot.interceptor.ResultChange">
+				</bean>
+			</array>
+		</property>
+	</bean>
+
+
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.zyiot.mapper" />
+	</bean>
+
+	<bean id="shiji" class="com.zyiot.task.ShiJiDuiJieTask" />
+	<bean id="warehouseInfo" class="com.zyiot.task.WarehouseInfoTask" />
+	<bean id="ammeters" class="com.zyiot.task.RemoteReadingAmmeters" />
+	<bean id="chuanganqi" class="com.zyiot.task.ChuanGanQiTask" />
+	<task:scheduled-tasks>
+		<task:scheduled ref="shiji" method="upload" cron="${shijiduijie}" />
+		<task:scheduled ref="warehouseInfo" method="getValuesOfMaxAndMin" cron="${getMaxAndMinTemperature}" />
+		<task:scheduled ref="warehouseInfo" method="getNeedTransformData" cron="${getNeedTransformData}" />
+		<task:scheduled ref="warehouseInfo" method="getTemperatureAlarm" cron="${getTemperatureAlarm}" />
+		<task:scheduled ref="ammeters" method="todo" cron="${remoteReading}" />
+		<task:scheduled ref="chuanganqi" method="taskSaveDatas" cron="${execSpace}" />
+	</task:scheduled-tasks>
+</beans>

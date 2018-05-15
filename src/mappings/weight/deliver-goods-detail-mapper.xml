@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.weight.DeliverGoodsDetailMapper">
+<select id="findByPage" resultType="com.zyiot.entity.weight.DeliverGoodsDetailFormMap">
+select * from t_deliver_goods_detail where 1=1
+<if test="cId !=null and cId != ''">
+ and cId='${cId}'
+</if>
+<if test="bId !=null">
+ and bId='${bId}'
+</if>
+</select>
+<select id="findDeliverGoodsDetailById" resultType="com.zyiot.entity.weight.DeliverGoodsDetailFormMap">
+select * from t_deliver_goods_detail where id=#{0}
+</select>
+
+</mapper>

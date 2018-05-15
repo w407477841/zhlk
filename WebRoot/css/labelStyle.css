@@ -1,0 +1,45 @@
+.div_label{
+text-align: right;
+padding-left: 0px;
+padding-right: 0px;
+height:38px;
+line-height:38px;
+}
+
+.div_required{
+	height: 38px;
+	padding-left: 0px;
+	padding-right: 0px;
+	line-height: 38px;
+	text-align: left;
+	font-size:large;
+	font-weight:bold;
+	color: red;
+}
+
+.div_label>span{
+	color: red;
+	padding-left: 3px;
+	font-size: large;
+}
+
+#errorDiv{
+	color: red;
+	background-color: white;
+	font-size: medium;
+	text-align: center;
+}
+
+.print_download{
+	margin-top: 10px;
+	margin-left: 10px;
+}
+.print_btn_pdf{
+	color: #8B2500;
+}
+.print_btn_excel{
+	color: #2E8B57;
+}
+.print_btn_word{
+	color: #36648B;
+}

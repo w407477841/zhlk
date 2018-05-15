@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.fuwupingtai.XinXiFaBuMapper">
+
+<select id="findByPage" resultType="com.zyiot.entity.fuwupingtai.XinXiFaBuFormMap">
+select 
+tir.*,
+tit.itName,
+tu.userName 
+from 
+t_info_release as tir,
+t_info_type as tit,
+t_user as tu
+where tir.irType = tit.id AND
+tir.irDataOperator = tu.id
+<if test="irTitle !=null and irTitle !=''">
+and tir.irTitle like '%${irTitle}%'
+</if>
+order by tir.irLevel desc,id desc
+</select>
+
+<select id="findXinXiFaBuById" resultType="com.zyiot.entity.fuwupingtai.XinXiFaBuFormMap">
+select * from t_info_release where id=#{0}
+</select>
+<select id="lookXinXiFaBuById" resultType="com.zyiot.entity.fuwupingtai.XinXiFaBuFormMap">
+select 
+tir.*,
+tit.itName,
+tu.userName 
+from 
+t_info_release as tir,
+t_info_type as tit,
+t_user as tu
+where tir.irType = tit.id AND
+tir.irDataOperator = tu.id AND
+tir.id=#{0}
+</select>
+<select id="findXinXiType" resultType="com.zyiot.util.FormMap">
+select id,itName from t_info_type where itParentId=1
+</select>
+</mapper>
+

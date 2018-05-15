@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.fuwupingtai.ZhengCeChaXunMapper">
+
+<select id="findByPage" resultType="com.zyiot.entity.fuwupingtai.ZhengCeChaXunFormMap">
+select tpq.* ,
+tit.itName
+from 
+t_policy_query as tpq,
+t_info_type as tit
+where tpq.pqType = tit.id
+<if test="pqTitle !=null and pqTitle !=''">
+and tpq.pqTitle like '%${pqTitle}%'
+</if>
+order by tpq.pqLevel desc,id desc
+</select>
+
+<select id="findZhengCeChaXunById" resultType="com.zyiot.entity.fuwupingtai.ZhengCeChaXunFormMap">
+select * from t_policy_query where id=#{0}
+</select>
+<select id="lookZhengCeChaXunById" resultType="com.zyiot.entity.fuwupingtai.ZhengCeChaXunFormMap">
+select tpq.* ,
+tit.itName,
+tu.userName
+from 
+t_policy_query as tpq,
+t_info_type as tit,
+t_user as tu
+where tpq.pqType = tit.id AND
+tpq.pqDataOperator = tu.id AND
+tpq.id=#{0}
+</select>
+<select id="findZhengCeType" resultType="com.zyiot.util.FormMap">
+select id,itName from t_info_type where itParentId=2
+</select>
+</mapper>
+

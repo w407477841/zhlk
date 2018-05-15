@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.UserMapper">
+
+<sql id="selectId">
+id,
+userName,
+accountName,
+password,
+credentialsSalt,
+description,
+locked,
+createTime,
+deletestatus,
+departmentid, 
+(select text from t_codeitem where codeid=9 and id=departmentid) departmentName,
+(select roleId from t_user_role where userId=t_user.id) roleId,
+(select tr.name from t_role tr right join t_user_role tur on tr.id=tur.roleId where tur.userId= t_user.id )roleName,
+version
+</sql>
+	<select id="findUserById" parameterType="java.lang.Integer"  resultType="com.zyiot.entity.UserFormMap" >
+	
+	select <include refid="selectId"></include>  from t_user where id=#{id}
+	
+	</select>
+	<select id="findUserByPage" resultType="com.zyiot.entity.UserFormMap" >
+	select tu.*,tr.`name`,tc.text from t_user AS tu LEFT JOIN
+    t_user_role as tur ON tu.id = tur.userId LEFT JOIN
+    t_role as tr ON tur.roleId = tr.id LEFT JOIN 
+    (select * from t_codeitem where codeid=9) as tc ON tc.id = tu.departmentid
+     where 1=1 
+	<if test="userName!=null and userName !=''">
+	and userName ='${userName}'
+	</if>
+	<if test="accountName!=null and accountName !=''">
+	and accountName ='${accountName}'
+	</if>
+	<if test="orderby!=null and orderby !=''">
+	${orderby}
+	</if>
+	</select>
+	<select id="findUserByRoleId" resultType="com.zyiot.entity.UserFormMap">
+	select userId from t_user_role where roleId in(${roleIds}) 
+	</select>
+	<update id="lockUserByAccountName">
+	 update t_user set locked='2' where accountName=#{0}
+	</update>
+	<select id="findUserFormByAccountName" resultType="com.zyiot.entity.UserFormMap">
+	 select tu.*,tcode.text department from (select * from t_user WHERE accountName = #{0}) as tu
+     LEFT JOIN (select id,text from t_codeitem where codeid = 9) as tcode ON tu.departmentid = tcode.id 
+	</select>
+</mapper>

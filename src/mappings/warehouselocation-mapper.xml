@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.WarehouseLocationMapper">
+	<select id="findTopOne" resultType="com.zyiot.entity.WarehouseLocationFormMap">
+		select id from t_warehouse_location order by id desc limit 0,1
+	</select>
+	<select id="findByPage" resultType="com.zyiot.entity.WarehouseLocationFormMap">
+		select * from t_warehouse_location where 1=1
+		<if test="wlNo != null and wlNo != ''">
+			and id = #{wlNo}
+		</if>
+		<if test="orderby != null and orderby != ''">
+			${orderby}
+		</if>
+	</select>
+	<select id="findBySelect" resultType="com.zyiot.entity.WarehouseLocationFormMap">
+		select id,wNo,wName from t_warehouse_location where wDisable = '1' ORDER BY wNo
+	</select>
+	<select id="getImagePath" resultType="java.lang.String">
+		select wPlaneImage from t_warehouse_location where id=#{0}
+	</select>
+	<select id="findWarehouseLocationById" resultType="com.zyiot.entity.WarehouseLocationFormMap">
+		select * from t_warehouse_location where id = #{0}
+	</select>
+
+</mapper>

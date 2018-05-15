@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.CodeItemMapper">
+<select id="findCodeItemByPage" resultType="com.zyiot.entity.CodeFormMap">
+select * from t_codeitem
+where 1=1
+<if test="codeid!=null and codeid!=''">
+and codeid=${codeid}
+</if>
+</select>
+</mapper>

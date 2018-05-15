@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.BusinessManagerMapper">
+<select id="findAgreementForm" resultType="com.zyiot.entity.BusinessAgreementFormFormMap">
+select * from t_business_agreement_form
+where 1=1 
+<if test="fName != null and fName != ''">
+and fName = #{fName}
+</if>
+<if test="orderby != null and orderby != ''">
+${orderby}
+</if>
+</select>
+</mapper>

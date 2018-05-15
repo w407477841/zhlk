@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cunchuguanli.LunHuanRuKuZhengLiHaoMapper">
+
+<select id="findByPage" resultType="com.zyiot.entity.cunchuguanli.LunHuanRuKuZhengLiHaoFormMap">
+SELECT tpsl.*,
+tw.wName,
+twl.wName wlName,
+tc.text category 
+from 
+t_putin_storage_loss as tpsl LEFT JOIN
+t_warehouse as tw ON tpsl.pslWId=tw.id LEFT JOIN
+t_warehouse_location as twl ON tw.wLocation=twl.id LEFT JOIN
+t_weight_grain_variety as tc ON tpsl.pslCategory = tc.id
+where 1=1
+<if test="wLocation !=null and wLocation !=''">
+	and tw.wLocation = #{wLocation}
+</if>
+<if test="waNo !=null and waNo !=''">
+and tw.id = #{waNo}
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+<select id="findLunHuanRuKuZhengLiHaoById" resultType="com.zyiot.entity.cunchuguanli.LunHuanRuKuZhengLiHaoFormMap">
+SELECT tpsl.*,tw.wLocation,tw.wName,twl.wName wlName,twgv.text from 
+(select * from t_putin_storage_loss where id=#{0}) as tpsl LEFT JOIN
+t_warehouse as tw ON tpsl.pslWId=tw.id LEFT JOIN
+t_warehouse_location as twl ON tw.wLocation = twl.id LEFT JOIN
+t_weight_grain_variety as twgv ON tpsl.pslCategory = twgv.id
+</select>
+	<select id="findCheckDetailById"
+		resultType="com.zyiot.entity.cunchuguanli.LunHuanRuKuZhengLiHaoFormMap">
+SELECT wStorage.text,wStorage.cangKu,name,tCheck.sf,tCheck.zz from (
+select tsi.cangKu,tsi.storageID,tsi.name,twgv.text from (select * FROM t_storag_info where storageID = #{0}) as tsi LEFT JOIN t_weight_grain_variety as twgv
+ON tsi.name = twgv.id
+) wStorage LEFT JOIN
+<!-- 查找质检信息 - 最近一条数据 -->
+(
+select wId,sf,zz from t_quality_manager where wId = #{0} AND checkDate > 
+IFNULL((select emptyDate from t_storage_empty_info where wId = #{0} ORDER BY emptyDate DESC LIMIT 0,1),"2010-01-01 00:00:00"
+) ORDER BY checkDate DESC LIMIT 0,1
+) as tCheck ON wStorage.storageID = tCheck.wId 
+
+	</select>
+</mapper>
+

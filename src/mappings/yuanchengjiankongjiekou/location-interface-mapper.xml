@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.yuanchengjiankongjiekou.WarehouseInterfaceMapper">
+<select id="findByPage" resultType="com.zyiot.entity.yuanchengjiankongjiekou.WarehouseInterfaceFormMap">
+select tcw.*,tw.wName,twl.wName wlName from t_contrast_warehouse as tcw LEFT JOIN t_warehouse as tw
+ON tcw.warehose_id = tw.id LEFT JOIN t_warehouse_location as twl
+ON tw.wLocation = twl.id
+<if test="orderby !=null and codeidorderby !=''">
+${orderby}
+</if>
+</select>
+</mapper>

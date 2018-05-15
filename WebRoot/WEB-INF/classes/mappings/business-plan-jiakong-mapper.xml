@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.BusinessManagerMapper">
+<select id="findJiakongPlans" parameterType="java.util.HashMap" resultType="com.zyiot.entity.BusinessPlanForMapJiakong">
+	select tbpj.*,twgp.text grainroperty,twgv.text variety,tw.wName,twl.wName wlName from 
+    (select * from t_business_plan_jiakong 
+    WHERE 1=1
+	<if test="breed !='' and breed!=null ">
+	and breed=#{breed}
+	</if>
+	<if test="property !='' and property!=null ">
+	and property=#{property}
+	</if>
+    ) as tbpj LEFT JOIN t_weight_grain_property as twgp
+    ON tbpj.property = twgp.id LEFT JOIN t_weight_grain_variety as twgv
+    ON tbpj.breed = twgv.id LEFT JOIN t_warehouse as tw 
+    ON tbpj.wId = tw.id LEFT JOIN t_warehouse_location as twl
+    ON tw.wLocation = twl.id
+	<if test="orderby !='' and orderby!=null">
+	${orderby}
+	</if>
+</select>
+<select id="querySingleJiakongPlane" resultType="com.zyiot.entity.BusinessPlanForMapJiakong">
+select tbpj.*,tw.wLocation wlId from (select * from t_business_plan_jiakong where id=#{0}) as tbpj LEFT JOIN t_warehouse tw
+ON tbpj.wId = tw.id
+</select>
+
+</mapper>

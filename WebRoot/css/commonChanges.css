@@ -1,0 +1,12 @@
+.input_title_mine{
+	border:1px solid #aaa;
+	height: 25px
+	
+}
+
+.input_title_mine:HOVER {
+	border: 1px solid #aaa;
+}
+.input_title_mine:FOCUS {
+	border: 1px solid #aaa;
+}

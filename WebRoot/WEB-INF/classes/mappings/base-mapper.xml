@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.BaseMapper">
+	<!--mybatis ehcache缓存配置 -->
+	<!-- 以下两个<cache>标签二选一,第一个可以输出日志,第二个不输出日志 <cache type="org.mybatis.caches.ehcache.LoggingEhcache" 
+		/> -->
+	<!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+	<!-- 以下与实体类的中字段一致 -->
+	<select id="initTableField" resultType="java.util.HashMap">
+		select TABLE_NAME,group_concat(COLUMN_NAME) COLUMN_NAME 
+		from information_schema.columns 
+		where table_name in (${table_name}) and table_schema in (${database_name})  GROUP BY TABLE_NAME
+	</select>
+
+	<insert id="addEntity" useGeneratedKeys="true" keyProperty="id" >
+		insert into (fleids) values (values)
+	</insert>
+	
+	<insert id="batchSave" parameterType="com.zyiot.util.BatchInsertParameter" >
+	</insert>
+	
+	<update id="updateEntity">
+			update table set (${fleids}) where id = (${id})
+	</update>
+	<!-- 这里的id可以是userid.或其他 -->
+	<delete id="deleteEntityByKey">
+		delete from table where ${param_key} = #{param_val}
+	</delete>
+
+	
+	<delete id="deleteEntityByNames">
+		delete from table where 1=1
+	</delete>
+	
+	<select id="findById" resultType="java.util.HashMap">
+	select * from t_table
+		where id=(id)
+	</select>
+	
+	<select id="findByAttr" resultType="java.util.HashMap" >
+	select * from t_table
+	</select>
+	
+</mapper>

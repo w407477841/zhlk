@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.yaojiguanli.YaoJiShenQingMapper">
+<select id="findByPage" resultType="com.zyiot.entity.yaojiguanli.YaoJiShenQingFormMap">
+select 
+tma.id,
+tma.maBill,
+tma.maName,
+tma.maBrand,
+tma.maStandard,
+tma.maQuantity,
+tma.maApplicant,
+tma.maProcess,
+tma.maApplyDate,
+tc.text,
+wl.wName
+from 
+t_medicament_apply as tma,
+t_codeitem as tc,
+t_warehouse_location as wl
+where tc.codeid = 22 AND
+tma.maPage = tc.id AND
+tma.maWLNo = wl.wNo
+
+<if test="maName !=null and maName !=''">
+and maName like '%${maName}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findShenPiByPage" resultType="com.zyiot.entity.yaojiguanli.YaoJiShenQingFormMap">
+select 
+tma.id,
+tma.maBill,
+tma.maName,
+tma.maBrand,
+tma.maStandard,
+tma.maQuantity,
+tma.maApplicant,
+tma.maProcess,
+tma.maApplyDate,
+tc.text,
+wl.wName
+from 
+t_medicament_apply as tma,
+t_codeitem as tc,
+t_warehouse_location as wl
+where tc.codeid = 22 AND
+tma.maProcess='等待审批' AND
+tma.maPage = tc.id AND
+tma.maWLNo = wl.wNo
+
+<if test="maName !=null and maName !=''">
+and maName like '%${maName}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findYaoJiShenQingById" resultType="com.zyiot.entity.yaojiguanli.YaoJiShenQingFormMap">
+select * from t_medicament_apply where id=#{0}
+</select>
+</mapper>
+

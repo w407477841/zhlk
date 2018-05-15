@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cunchuguanli.LunHuanChuKuBaoGuanHaoMapper">
+
+	<select id="findByPage"
+		resultType="com.zyiot.entity.cunchuguanli.LunHuanChuKuBaoGuanHaoFormMap">
+		select tgsl.*,
+		tw.wName,
+		twl.wName wlName,
+		twgv.text category
+		from
+		t_getout_storage_loss as tgsl LEFT JOIN
+		t_warehouse as tw on
+		tgsl.gslWId=tw.id LEFT JOIN
+		t_warehouse_location as twl ON tw.wLocation
+		= twl.id LEFT JOIN
+		t_weight_grain_variety as twgv ON tgsl.gslCategory =
+		twgv.id
+		where 1=1
+		<if test="wLocation !=null and wLocation !=''">
+			and tw.wLocation = #{wLocation}
+		</if>
+		<if test="waNo !=null and waNo !=''">
+			and tw.id = #{waNo}
+		</if>
+		<if test="orderby !=null and orderby !=''">
+			${orderby}
+		</if>
+	</select>
+	<select id="findLunHuanChuKuBaoGuanHaoById"
+		resultType="com.zyiot.entity.cunchuguanli.LunHuanChuKuBaoGuanHaoFormMap">
+		SELECT
+	tgsl.*, tw.wLocation,
+tw.wName,
+twl.wName wlName,
+twgv.text,
+twgp.text property,
+tcode.text packageText
+FROM
+(select * from t_getout_storage_loss where id = #{0}) AS tgsl
+LEFT JOIN t_warehouse AS tw ON tgsl.gslWId = tw.id
+LEFT JOIN t_warehouse_location as twl ON tw.wLocation = twl.id
+LEFT JOIN t_weight_grain_variety as twgv ON tgsl.gslCategory = twgv.id
+LEFT JOIN t_weight_grain_property as twgp ON tgsl.gslProperty = twgp.id
+LEFT JOIN (select id,text from t_codeitem where codeid=26) as tcode ON tgsl.gslPackageWay = tcode.id
+	</select>
+	<select id="findCheckDetailById"
+		resultType="com.zyiot.entity.cunchuguanli.LunHuanChuKuBaoGuanHaoFormMap">
+<!-- 
+SELECT wStorage.text,wStorage.cangKu,name,tCheck.sf,tCheck.zz,inStorage.inTotalWeight,outStorage.outTotalWeight from (
+select tsi.cangKu,tsi.storageID,tsi.name,twgv.text from (select * FROM t_storag_info where storageID = #{0}) as tsi LEFT JOIN t_weight_grain_variety as twgv
+ON tsi.name = twgv.id
+) wStorage LEFT JOIN
+< 查找质检信息 - 第一条数据>
+(
+select wId,sf,zz from t_quality_manager where wId = #{0} AND checkDate > 
+IFNULL((select emptyDate from t_storage_empty_info where wId = #{0} ORDER BY emptyDate DESC LIMIT 0,1),"2010-01-01 00:00:00"
+) ORDER BY checkDate DESC LIMIT 0,1
+) as tCheck ON wStorage.storageID = tCheck.wId LEFT JOIN
+< 统计入库重量 >
+(
+select wId,SUM(totalWeight) inTotalWeight from t_weight_report_harbor where addDate >
+IFNULL((select emptyDate from t_storage_empty_info where wId = #{0} ORDER BY emptyDate DESC LIMIT 0,1),"2010-01-01 00:00:00")
+AND wId = #{0} AND inOrOut = 2
+) as inStorage ON wStorage.storageID = inStorage.wId LEFT JOIN
+<统计出库重量 >
+(
+select wId,SUM(totalWeight) outTotalWeight from t_weight_report_harbor where addDate >
+IFNULL((select emptyDate from t_storage_empty_info where wId = #{0} ORDER BY emptyDate DESC LIMIT 0,1),"2010-01-01 00:00:00")
+AND wId = #{0} AND inOrOut = 1
+) as outStorage ON wStorage.storageID = outStorage.wId
+ -->
+ SELECT variety,property,package,wStorage.cangKu,name,wStorage.quanZhong,wStorage.packageWay,tCheck.sf,tCheck.zz,inStorage.inTotalWeight,outStorage.outTotalWeight from (
+select tsi.cangKu,tsi.storageID,tsi.name,tsi.packageWay,tsi.quanZhong,twgv.text variety,twgp.text property,tcode.text package from (select * FROM t_storag_info where storageID = #{0}) as tsi LEFT JOIN t_weight_grain_variety as twgv
+ON tsi.name = twgv.id LEFT JOIN t_weight_grain_property as twgp 
+ON tsi.quanZhong = twgp.id LEFT JOIN (select id,text from t_codeitem where codeid = '26') as tcode
+ON tsi.packageWay = tcode.id
+) wStorage LEFT JOIN
+<!-- 查找质检信息 - 第一条数据-->
+(
+select wId,sf,zz from t_quality_manager where wId = #{0} AND checkDate > 
+IFNULL((select emptyDate from t_storage_empty_info where wId = #{0} ORDER BY emptyDate DESC LIMIT 0,1),"2010-01-01 00:00:00"
+) ORDER BY checkDate DESC LIMIT 0,1
+) as tCheck ON wStorage.storageID = tCheck.wId LEFT JOIN
+<!-- 统计入库重量 -->
+(
+select wId,SUM(totalWeight) inTotalWeight from t_weight_report_harbor where addDate >
+IFNULL((select emptyDate from t_storage_empty_info where wId = #{0} ORDER BY emptyDate DESC LIMIT 0,1),"2010-01-01 00:00:00")
+AND wId = #{0} AND inOrOut = 2
+) as inStorage ON wStorage.storageID = inStorage.wId LEFT JOIN
+<!-- 统计出库重量 -->
+(
+select wId,SUM(totalWeight) outTotalWeight from t_weight_report_harbor where addDate >
+IFNULL((select emptyDate from t_storage_empty_info where wId = #{0} ORDER BY emptyDate DESC LIMIT 0,1),"2010-01-01 00:00:00")
+AND wId = #{0} AND inOrOut = 1
+) as outStorage ON wStorage.storageID = outStorage.wId
+ 
+	</select>
+</mapper>
+

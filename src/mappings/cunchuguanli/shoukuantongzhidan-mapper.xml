@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cunchuguanli.ShouKuanTongZhiDanMapper">
+
+<select id="findByPage" resultType="com.zyiot.entity.cunchuguanli.ShouKuanTongZhiDanFormMap">
+select tcn.*,
+tw.wName,
+twl.wName wlName,
+tc1.text property,
+tc2.text variety
+from 
+t_credit_note as tcn,
+t_warehouse as tw,
+t_warehouse_location as twl,
+t_codeitem as tc1,
+t_codeitem as tc2
+where 
+tcn.cnWId = tw.id AND
+tw.wLocation = twl.id AND
+tcn.cnProperty = tc1.id AND
+tc1.codeid=11 AND
+tcn.cnVariety = tc2.id AND
+tc2.codeid=12
+<if test="cnCustomName !=null and cnCustomName !=''">
+and tcn.cnCustomName like '%${cnCustomName}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+<select id="findShouKuanTongZhiDanById" resultType="com.zyiot.entity.cunchuguanli.ShouKuanTongZhiDanFormMap">
+select tcn.*,
+tw.wLocation
+from 
+t_credit_note as tcn,
+t_warehouse as tw
+where 
+tcn.cnWId = tw.id and
+tcn.id=#{0}
+</select>
+<select id="lookShouKuanTongZhiDanById" resultType="com.zyiot.entity.cunchuguanli.ShouKuanTongZhiDanFormMap">
+select tcn.cnCustomName,
+tcn.cnPayment,
+tcn.cnMoneyDate,
+tcn.cnAddDate,
+tw.wName,
+twl.wName wlName
+from 
+t_credit_note as tcn,
+t_warehouse as tw,
+t_warehouse_location as twl
+where 
+tcn.cnWId = tw.id AND
+tw.wLocation = twl.id AND
+tcn.id=#{0}
+</select>
+</mapper>
+

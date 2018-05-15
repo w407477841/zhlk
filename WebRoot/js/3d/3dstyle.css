@@ -1,0 +1,31 @@
+﻿@charset "utf-8";
+/* CSS Document */
+.titile{line-height:15px; font-size:13px; color:rgb(10,76,150); font-family:'寰蒋闆呴粦';z-index: 120;  position: absolute; top:-6px; left:20px; font-style:italic;}
+.titileDiv{width:390px; height:58px; position: absolute; top:18px; left:10px;}
+
+.house{width:780px; height:391px; position: absolute;/* top:90px; left:40px; background:url(../images/mian-1.png) no-repeat;*/ top:60px; left:20px}
+.house img{ width:780px; height:391px;}
+.divlable{position: absolute;z-index: 120;top:210px;left:550px; color:rgb(255,109,0); height:28px; line-height:28px;font-family:'寰蒋闆呴粦'; font-size:14px; font-weight:500;font-style:italic;}
+.houseclick4{ width:780px; height:391px; position: absolute; top:60px; left:20px}
+.houseclick4 img{width:780px; height:391px;}
+.houseclick3{ width:780px; height:391px; position: absolute; top:60px; left:20px}
+.houseclick3 img{width:780px; height:391px;}
+.houseclick2{ width:780px; height:391px; position: absolute; top:60px; left:20px}
+.houseclick2 img{width:780px; height:391px;}
+.houseclick1{ width:780px; height:391px; position: absolute; top:60px; left:20px}
+.houseclick1 img{width:780px; height:391px;}
+
+.house4{background:url(../images/tm.png); position: absolute;z-index: 120; top:212px; left:20px;cursor:pointer; width:228px; height:123px;}
+.house4:hover{background:url(../images/hover4-1.png);}
+
+
+.house3{ background:url(../images/tm.png); width:224px; height:85px; position: absolute;z-index: 122; top:280px; left:26px;cursor:pointer;}
+.house3:hover{ background:url(../images/hover3-1.png) no-repeat;}
+
+.house2{ background:url(../images/tm.png); width:224px; height:90px; position: absolute;z-index: 121; top:310px; left:28px;cursor:pointer;}
+.house2:hover{ background:url(../images/hover2-1.png) no-repeat;}
+.house1{ background:url(../images/tm.png); width:224px; height:100px; position: absolute;z-index: 120; top:344px; left:35px;cursor:pointer;}
+.house1:hover{ background:url(../images/hover1-1.png) no-repeat;}
+.table{ border:0px; width:360px; height:205px; margin:0px; padding:0px;position: absolute;z-index: 120;top:40px;left:395px;color:#999999;font-size:12px;}
+.table tr td{ width:33px; height:35px; text-align:center;}
+.tdborder{ border-bottom:rgb(235,235,235) dotted  1px; border-left:rgb(235,235,235) dotted  1px;}

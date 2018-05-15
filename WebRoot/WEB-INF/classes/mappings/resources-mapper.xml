@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.ResourcesMapper">
+
+<sql id="selectId">
+		id,
+		name,
+		parentId,
+		(select r.name from t_resources r where r.id = t_resources.parentId )
+		parentName,
+		resKey,
+		ishide,
+		type,
+		resUrl,
+		level,
+		icon,
+		description
+	</sql>
+	
+	
+<sql id="selectId1">
+		t1.id id,
+		t1.name name,
+		t1.parentId parentId,
+		(select r.name from t_resources r where r.id = t1.parentId )
+		parentName,
+		t1.resKey resKey,
+		t1.ishide ishide,
+		t1.type		type,
+		t1.resUrl resUrl,
+		t1.level level,
+		t1.icon icon,
+		t1.description		description
+	</sql>
+	
+<!-- 根据账号Id获取该用户的权限 -->
+	<select id="findUserResourcess" parameterType="String"
+		resultType="com.zyiot.entity.ResFormMap">
+		SELECT
+		<include refid="selectId" />
+		from t_resources where id in(
+		select resId from t_res_user
+		where userId=#{userId})
+	</select>	
+
+<!-- 获取该用户的权限 -->
+	<select id="findRes"  resultType="com.zyiot.entity.ResFormMap">
+		SELECT
+		<include refid="selectId" />
+		from t_resources where id in(
+		select resId from
+		t_res_user where 1=1
+		<if test="userId != null and userId != '' and userId != 0">
+		and userId = #{userId}
+		</if>
+		<if test="roleId != null and roleId != '' and roleId != 0">
+		and userId in (
+		      SELECT userId from t_user_role where roleId = #{roleId}
+		   )
+		</if>
+		)
+		<if test="parentId != null and parentId != '' and parentId != 0">
+			and parentId = #{parentId}
+		</if>
+		order by level asc
+	</select>
+	
+	
+	<select id="findFirstRes"  resultType="com.zyiot.entity.ResFormMap">
+		SELECT
+		<include refid="selectId" />
+		from t_resources where id in(
+		select resId from
+		t_res_user where 1=1
+		<if test="userId != null and userId != '' and userId != 0">
+		and userId = #{userId}
+		</if>
+		)
+		<if test="parentId != null and parentId != ''" >
+			and parentId = #{parentId}
+		</if>
+		order by level asc
+	</select>
+	
+	
+	<select id="findRes_RoleIdORUserId"  resultType="com.zyiot.entity.ResFormMap">
+		select<include refid="selectId1"></include>  from t_resources t1 right join
+		<if test="roleId !='' and roleId!=null">
+		 t_role_res t2 on t1.id=t2.resId where t2.roleId='${roleId}'
+		</if>
+	    <if test="userId !='' and userId!=null">
+		 t_res_user t2 on t1.id=t2.resId where t2.userId='${userId}'
+		</if>
+	</select>
+	
+	<select id="findResByPage" resultType="com.zyiot.entity.ResFormMap" >
+	select <include refid="selectId"></include> from t_resources where 1=1 
+	
+	<if test="id !=null and id!=''">
+	and id in (${id})
+	</if>
+	<if test="name !=null and name!=''">
+	and name =${name}
+	</if>
+	<if test="orderby !=null and orderby !=''">
+	${orderby}
+	</if>
+	</select>
+	<!-- 删除 所有 带 roleId 的用户 下的 roleId对应的权限-->
+	<delete id="deleteResByRoleId" >
+	delete from t_res_user where userId
+	 in( select ur.userId from t_user_role ur left join t_user u on ur.userId=u.id where ur.roleId='${roleId}'   )
+	</delete>
+	
+	
+	<insert id="addResUser" >
+	insert into t_res_user (resId,userId)  select resId ,'${userId}' from t_role_res where roleId='${roleId}'
+	</insert>
+	
+	
+<select id="findAllParent" resultType="com.zyiot.entity.ResFormMap">
+
+select id ,name,parentId from t_resources where parentId=0
+UNION ALL
+select id ,name,parentId from t_resources where parentId in (select id from t_resources where parentId=0)
+UNION All
+select id ,name,parentId from t_resources where parentId in (select id from t_resources where parentId in (select id from t_resources where parentId=0))
+UNION All
+select id ,name,parentId from t_resources where parentId in (select id from t_resources where parentId in (select id from t_resources where parentId in (select id from t_resources where parentId=0)))
+UNION All
+select id ,name,parentId from t_resources where parentId in (select id from t_resources where parentId in (select id from t_resources where parentId in (select id from t_resources where parentId in (select id from t_resources where parentId=0))))
+</select>
+
+	
+</mapper>

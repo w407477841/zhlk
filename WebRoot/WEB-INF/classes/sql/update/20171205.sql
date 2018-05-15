@@ -1,0 +1,1 @@
+alter table t_login_log add COLUMN description VARCHAR(64) comment '登录状态描述';

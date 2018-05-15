@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cunchuguanli.ChuKuShenPiMapper">
+
+<select id="findByPage" resultType="com.zyiot.entity.cunchuguanli.ChuKuShenPiFormMap">
+select tgsa.*,tu.userName FROM 
+t_getout_storage_auditing as tgsa,
+t_user as tu
+where tgsa.gsaAuditor = tu.id
+
+<if test="gsaApplyBill !=null and gsaApplyBill !=''">
+and tgsa.gsaApplyBill like '%${gsaApplyBill}%'
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+</mapper>
+

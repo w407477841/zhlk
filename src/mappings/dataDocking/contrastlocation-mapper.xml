@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.dataDocking.ContrastLocationMapper">
+
+<select id="findContrastLocationByWLNO" resultType="com.zyiot.entity.dataDocking.ContrastLocationFormMap">
+ select * from t_contrast_location where location_no = #{0}
+</select>
+
+</mapper>

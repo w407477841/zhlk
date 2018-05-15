@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.yuanchengjiankongjiekou.WarehouseLocationInterfaceMapper">
+<select id="findByPage" resultType="com.zyiot.entity.yuanchengjiankongjiekou.WarehouseLocationInterfaceFormMap">
+select tcl.*,twl.wName from t_contrast_location as tcl LEFT JOIN
+t_warehouse_location as twl ON tcl.location_no = twl.id
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+<select id="findByXinYongDaiMa" resultType="com.zyiot.entity.yuanchengjiankongjiekou.WarehouseLocationInterfaceFormMap">
+select qiyemingcheng from t_contrast_location where tongyixinyongdaima = #{0} LIMIT 0,1
+</select>
+<select id="findAllByXinYongDaiMa" resultType="com.zyiot.entity.yuanchengjiankongjiekou.WarehouseLocationInterfaceFormMap">
+select tcl.*,twl.wName from (select * from t_contrast_location where tongyixinyongdaima = #{0}) as tcl LEFT JOIN t_warehouse_location as twl
+ON tcl.location_no = twl.id
+</select>
+<select id="findAllMingCheng" resultType="com.zyiot.entity.yuanchengjiankongjiekou.WarehouseLocationInterfaceFormMap">
+select tongyixinyongdaima,qiyemingcheng from t_contrast_location GROUP BY tongyixinyongdaima
+</select>
+
+</mapper>

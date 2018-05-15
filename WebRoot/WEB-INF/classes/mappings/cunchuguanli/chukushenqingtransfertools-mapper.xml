@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cunchuguanli.ChuKuShenQingTransferToolsMapper">
+
+<select id="findByPage" resultType="com.zyiot.entity.cunchuguanli.ChuKuShenQingTransferToolsFormMap">
+select * from t_getout_storage_apply_transfer_tools where version=1
+
+and gsaaDataOperator = ${gsaaDataOperator}
+<if test="gsaTransferTools !=null and gsaTransferTools !=''">
+or id in (${gsaTransferTools})
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+<update id="updateVersion">
+  update t_getout_storage_apply_transfer_tools set version=2 where id=#{0}
+</update>
+<delete id="clearNoUsed">
+  delete from t_getout_storage_apply_transfer_tools where version = 1 and gsaaDataOperator=#{0}
+</delete>
+
+<select id="findByIds" resultType="com.zyiot.entity.cunchuguanli.ChuKuShenQingTransferToolsFormMap">
+select * from t_getout_storage_apply_transfer_tools where id in 
+    <foreach item="tempId" collection="list" open="(" separator="," close=")">
+        #{tempId}
+    </foreach>
+</select>
+
+</mapper>
+

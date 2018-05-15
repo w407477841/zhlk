@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyiot.mapper.cunchuguanli.YiJiaoGuanLiMapper">
+<sql id="selectId">
+twt.*,
+tpa1.paName poName,
+tpa2.paName pnName,
+tw.wName,
+twl.wName wlName
+</sql>
+<select id="findByPage" resultType="com.zyiot.entity.cunchuguanli.YiJiaoGuanLiFormMap">
+
+select <include refid="selectId"></include> from t_warehouse_transfer as twt,t_person_archives as tpa1,t_person_archives as tpa2,t_warehouse as tw,t_warehouse_location as twl where twt.wtOriginalStoreman=tpa1.id and twt.wtNowStoreman=tpa2.id and tw.id=twt.wtId and tw.wLocation = twl.id
+<if test="wLNo !=null and wLNo !=''">
+and twl.id =#{wLNo}
+</if>
+<if test="wNo !=null and wNo !=''">
+and tw.id =#{wNo}
+</if>
+<if test="orderby !=null and orderby !=''">
+${orderby}
+</if>
+</select>
+
+<select id="findYiJiaoGuanLiById" resultType="com.zyiot.entity.cunchuguanli.YiJiaoGuanLiFormMap">
+select <include refid="selectId"></include> from t_warehouse_transfer as twt,t_person_archives as tpa1,t_person_archives as tpa2,t_warehouse as tw,t_warehouse_location as twl where twt.wtOriginalStoreman=tpa1.id and twt.wtNowStoreman=tpa2.id and tw.id=twt.wtId and tw.wLocation = twl.id and twt.id=#{0}
+</select>
+</mapper>
+
